@@ -1,6 +1,6 @@
 var http = require("http");
 var db = require("../controllers/database");
-var palo = require('../controllers/palo');
+var palo = require('../controllers/libs').palo;
 /*
  * GET home page.
  */
@@ -10,7 +10,11 @@ exports.index = function(req, res){
 };
 
 exports.login = function(req,res){
-    res.send(palo.server.login());
+    palo.server.databases({show_normal:1},function(resp){
+        palo.sid = resp.sid;
+        palo.ttl = resp.ttl;
+        res.send(200,resp);
+    });
     /*db.getInstance().llen('olap:servers',function(err,result){
                             if (err) throw 'err';
                             if (!result){

@@ -1,5 +1,3 @@
-var palo = require('./controllers/palo');
-console.log(palo);
 /**
  * Module dependencies.
  */

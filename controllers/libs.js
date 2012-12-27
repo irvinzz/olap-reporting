@@ -1,13 +1,68 @@
 var http = require("http");
 var host = 'ya.ru';
 //var 
+function palo_http_get(path,parameters,results,callback){
+    var r='';
+    var p='>';
+    for (var i in parameters){
+        console.log(i);
+    }
+    
+    
+    for (var i = 0; i < parameters.length; i++) {
+        if (i!==0){
+            p+='&';
+        }
+        var key = parameters[i].name;
+        console.log(key+' > '+parameters[key]);
+        r+=key+'='+parameters[key];
+    }
+    if (p!==''){
+        p='?'+p;
+    }
+    console.log(parameters);
+    console.log(p);
+    http.get({
+        host:host,
+        path:path
+    },function(res){
+        res.on('error',function(e){
+            callback(e);
+        });
+        res.on('data',function(c){
+            r+=c;
+        });
+        res.on('end',function(){
+            r=r.split(';');
+            var r2={};
+            for (var i = 0; i < results.length; i++) {
+                r2[results[i]]=r[i];
+            }
+            callback(r2);
+        });
+    });
+}
 
 exports.palo = {
     host: 'olap.rts-ugra.ru',
     port: '',
+    sid: undefined,
+    ttl: undefined,
     server : {
-        databases : function(){
-            return 0;
+        databases : function(parameters,callback){
+            palo_http_get(
+                '/server/databases',
+                parameters,
+                [
+                    'database',
+                    'name_database',
+                    'number_dimensions',
+                    'number_cubes',
+                    'status',
+                    'type',
+                    'database_token'
+                ],
+                callback);
         },
         info: function(){
             
@@ -16,20 +71,25 @@ exports.palo = {
             
         },
         login: function(login,password,callback){
-            var result='';
+            var r='';
             http.get({
                     host: host,
                     //path: '/server/login?user='+'user'+'&extern_password='+'password',
                     path: '/',
                     },function(res){
+                        console.log('host: '+host);
                         res.on('error', function(e) {
                             return callback(e);
                         });
-                        res.on('data',function(chunk) {
-                            result+=chunk;
+                        res.on('data',function(c) {
+                            r+=c;
                         });
                         res.on('end',function(){
-                            callback(result);
+                            r = r.split(';');
+                            r = {sid:r[0],ttl:r[1]};
+                            sid = r.sid;
+                            ttl = r.ttl;
+                            callback(r);
                         });
                     }
             );
