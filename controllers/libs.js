@@ -1,300 +1,384 @@
 var http = require("http");
-var host = 'ya.ru';
-//var 
-function palo_http_get(path,parameters,results,callback){
-    var r='';
-    var p='>';
-    for (var i in parameters){
-        console.log(i);
-    }
-    
-    
-    for (var i = 0; i < parameters.length; i++) {
-        if (i!==0){
-            p+='&';
-        }
-        var key = parameters[i].name;
-        console.log(key+' > '+parameters[key]);
-        r+=key+'='+parameters[key];
-    }
-    if (p!==''){
-        p='?'+p;
-    }
-    console.log(parameters);
-    console.log(p);
-    http.get({
-        host:host,
-        path:path
-    },function(res){
-        res.on('error',function(e){
-            callback(e);
-        });
-        res.on('data',function(c){
-            r+=c;
-        });
-        res.on('end',function(){
-            r=r.split(';');
-            var r2={};
-            for (var i = 0; i < results.length; i++) {
-                r2[results[i]]=r[i];
-            }
-            callback(r2);
-        });
-    });
-}
+var Class = require('node-class').Class;
+var MD5 = require('MD5');
 
-exports.palo = {
-    host: 'olap.rts-ugra.ru',
-    port: '',
-    sid: undefined,
-    ttl: undefined,
-    server : {
-        databases : function(parameters,callback){
-            palo_http_get(
-                '/server/databases',
-                parameters,
-                [
+var paloClass = Class("PaloClass",{
+    host : 'localhost',
+    port : '',
+    sid : undefined,
+    ttl : undefined,
+});
+paloClass.implements({
+    __construct: function(){
+        var c = this;
+        this.server = new serverClass(c);
+        this.database = new databaseClass(c);
+        this.dimension = new dimensionClass(c);
+        this.element = new elementClass(c);
+        this.cube = new cubeClass(c);
+        this.cell = new cellClass(c);
+        this.event = new eventClass(c);
+        this.rule = new ruleClass(c);
+        this.svs = new svsClass(c);
+    },
+    hg: function (path,parameters,results,callback){
+        var r='';
+        var p='';
+        var i=0;
+        for (var k in parameters) {
+            if (i!==0) p+='&';
+            p+=k+'='+parameters[k];
+            i++;
+        }
+        console.log('accessing to :'+path+'?'+p+'&'+'sid='+(this.sid || ''));
+        http.get({
+            host:this.host,
+            port:this.port,
+            path:path+'?'+p+'&'+'sid='+(this.sid || ''),
+        },onResponse);
+        
+        function onResponse(res){
+            res.on('error',function(e){
+                callback(e,e);
+            });
+            res.on('data',function(c){
+                r+=c;
+            });
+            res.on('end',function(){
+                console.log(res.statusCode);
+                if (res.statusCode===200){
+                    var result=[];
+                    var rs=r.split('\n');
+                    for (var i=0;i<rs.length;i++){
+                        if (rs[i]!==''){
+                            var r1 = rs[i].split(';');
+                            var r2 = {};
+                            for (var j = 0; j < results.length; j++) {
+                                r2[results[j]]=r1[j];
+                            }
+                            result.push(r2);
+                        }
+                    }
+                    if (result.length>1)
+                        callback(null,result);
+                    else
+                        callback(null,result[0]);
+                }else{
+                    callback(res.statusCode,r);
+                }
+                
+            });
+        }
+    },
+    
+});
+
+exports.paloServers = [];
+
+exports.paloClass = paloClass;
+
+var paloSubClass = Class("PaloSubClass",{
+});
+paloSubClass.implements({
+    __construct: function (p){
+        this.palo = p;
+    }
+});
+
+var serverClass = Class("ServerClass",{
+});
+serverClass.extends(paloSubClass,false);
+serverClass.implements({
+    _sR: function(params,diff,callback){
+        this.palo.hg(
+            '/server/'+diff.f,
+            params,
+            diff.k,
+            callback
+        );
+    },
+    databases : function(params,callback){
+        this._sR(
+            params,
+            {
+                f: 'databases',
+                k: [
                     'database',
                     'name_database',
                     'number_dimensions',
                     'number_cubes',
                     'status',
                     'type',
-                    'database_token'
-                ],
-                callback);
-        },
-        info: function(){
-            
-        },
-        load:function(){
-            
-        },
-        login: function(login,password,callback){
-            var r='';
-            http.get({
-                    host: host,
-                    //path: '/server/login?user='+'user'+'&extern_password='+'password',
-                    path: '/',
-                    },function(res){
-                        console.log('host: '+host);
-                        res.on('error', function(e) {
-                            return callback(e);
-                        });
-                        res.on('data',function(c) {
-                            r+=c;
-                        });
-                        res.on('end',function(){
-                            r = r.split(';');
-                            r = {sid:r[0],ttl:r[1]};
-                            sid = r.sid;
-                            ttl = r.ttl;
-                            callback(r);
-                        });
-                    }
-            );
-        },
-        logout: function(){
-            
-        },
-        save: function(){
-            
-        },
-        shutdown: function(){
-            
-        }
+                    'database_token',
+                ]
+            },
+            callback
+        );
     },
-    database : {
-        cubes: function(){
-            
-        },
-        create: function(){
-            
-        },
-        destroy: function(){
-            
-        },
-        dimensions: function(){
-            
-        },
-        info: function(){
-            
-        },
-        load: function(){
-            
-        },
-        rename: function(){
-            
-        },
-        save: function(){
-            
-        },
-        unload: function(){
-            
-        }
+    info: function(p,c){
+        this._sR(
+            null,
+            {
+                f:'info',
+                k:['major_version','minor_version','bugfix_version','build_number','encryption','https_port']
+            },
+            c
+        );
     },
-    dimension : {
-        clear: function(){
-            
-        },
-        create: function(){
-            
-        },
-        cubes: function(){
-            
-        },
-        destroy: function(){
-            
-        },
-        element: function(){
-            
-        },
-        elements: function(){
-            
-        },
-        info: function(){
-            
-        },
-        rename: function(){
-            
-        },
+    load:function(p,c){
+        this._sR(p,{f: 'load',k: ['OK']},c);
     },
-    element : {
-        append: function(){ // Adds children to consolidated elements.     dimension
-            
-        },
-        create: function(){ // Creates new element.     dimension
-            
-        },
-        create_bulk: function(){ // Creates multiple elements of the same type.     dimension
-            
-        },
-        destroy: function(){ // Deletes an element.     dimension
-            
-        },
-        destroy_bulk: function(){ // Delete list of elements.     dimension
-            
-        },
-        info: function(){ // Shows identifer, name, position, level, depth, parents and children of an element.     dimension
-            
-        },
-        move: function(){ // Changes position of an element.     dimension
-            
-        },
-        rename: function(){ // Renames an element.     dimension
-            
-        },
-        replace: function(){ // Changes or creates a new element. Replaces children in consolidated elements.     dimension
-            
-        },
-        replace_bulk: function(){
-            
-        },
+    login: function(p,c){
+        var _this=this;
+        this._sR(p,{f: 'login',k: ['sid','ttl']},function(err,result){
+            if (!err){
+                _this.palo.sid = result.sid;
+                _this.palo.ttl = result.ttl;
+            }
+            c(err,result);
+        });
     },
-    cube : {
-        clear: function(){
-            
-        },
-        commit: function(){
-            
-        },
-        create: function(){
-            
-        },
-        convert: function(){
-            
-        },
-        destroy: function(){
-            
-        },
-        info: function(){
-            
-        },
-        load: function(){
-            
-        },
-        lock: function(){
-            
-        },
-        locks: function(){
-            
-        },
-        rename: function(){
-            
-        },
-        rollback: function(){
-            
-        },
-        rules: function(){
-            
-        },
-        save: function(){
-            
-        },
-        unload: function(){
-            
-        },
+    logout: function(p,c){
+        this._sR(p,{f: 'logout',k: ['OK']},c);
     },
-    cell : {
-        area: function(){
-            
-        },
-        copy: function(){
-            
-        },
-        drillthrough: function(){
-            
-        },
-        export: function(){
-            
-        },
-        goalseek: function(){
-            
-        },
-        replace: function(){
-            
-        },
-        replace_bulk: function(){
-            
-        },
-        value: function(){
-            
-        },
-        values: function(){
-            
-        },
+    save: function(p,c){
+        this._sR(p,{f:'save',k:['OK']},c);
     },
-    event : {
-        begin: function(){
+    shutdown: function(p,c){
+        
+    }
+});
+
+var databaseClass = Class("DatabaseClass",{
+    
+});
+databaseClass.extends(paloSubClass,false);
+databaseClass.implements({
+    cubes: function(){
             
-        },
-        end: function(){
-            
-        },
     },
-    rule : {
-        create: function(){
-            
-        },
-        destroy: function(){
-            
-        },
-        functions: function(){
-            
-        },
-        info: function(){
-            
-        },
-        modify: function(){
-            
-        },
-        parse: function(){
-            
-        },
+    create: function(){
+        
     },
-    svs : {
-        info: function(){
-            
-        }
+    destroy: function(){
+        
     },
-};
+    dimensions: function(){
+        
+    },
+    info: function(){
+        
+    },
+    load: function(){
+        
+    },
+    rename: function(){
+        
+    },
+    save: function(){
+        
+    },
+    unload: function(){
+        
+    }
+});
+
+var dimensionClass = Class("DimensionClass",{
+    
+});
+dimensionClass.extends(paloSubClass,false);
+dimensionClass.implements({
+    clear: function(){
+            
+    },
+    create: function(){
+        
+    },
+    cubes: function(){
+        
+    },
+    destroy: function(){
+        
+    },
+    element: function(){
+        
+    },
+    elements: function(){
+        
+    },
+    info: function(){
+        
+    },
+    rename: function(){
+        
+    },
+});
+
+var elementClass = Class("ElementClass",{
+    
+});
+elementClass.extends(paloSubClass,false);
+elementClass.implements({
+    append: function(){ // Adds children to consolidated elements.     dimension
+                
+    },
+    create: function(){ // Creates new element.     dimension
+        
+    },
+    create_bulk: function(){ // Creates multiple elements of the same type.     dimension
+        
+    },
+    destroy: function(){ // Deletes an element.     dimension
+        
+    },
+    destroy_bulk: function(){ // Delete list of elements.     dimension
+        
+    },
+    info: function(){ // Shows identifer, name, position, level, depth, parents and children of an element.     dimension
+        
+    },
+    move: function(){ // Changes position of an element.     dimension
+        
+    },
+    rename: function(){ // Renames an element.     dimension
+        
+    },
+    replace: function(){ // Changes or creates a new element. Replaces children in consolidated elements.     dimension
+        
+    },
+    replace_bulk: function(){
+        
+    },
+});
+
+var cubeClass = Class("CubeClass",{
+    
+});
+cubeClass.extends(paloSubClass,false);
+cubeClass.implements({
+    clear: function(){
+                
+    },
+    commit: function(){
+        
+    },
+    create: function(){
+        
+    },
+    convert: function(){
+        
+    },
+    destroy: function(){
+        
+    },
+    info: function(){
+        
+    },
+    load: function(){
+        
+    },
+    lock: function(){
+        
+    },
+    locks: function(){
+        
+    },
+    rename: function(){
+        
+    },
+    rollback: function(){
+        
+    },
+    rules: function(){
+        
+    },
+    save: function(){
+        
+    },
+    unload: function(){
+        
+    },
+})
+
+var cellClass = Class("CellClass",{
+    
+});
+cellClass.extends(paloSubClass,false);
+cellClass.implements({
+    area: function(){
+            
+    },
+    copy: function(){
+        
+    },
+    drillthrough: function(){
+        
+    },
+    export: function(){
+        
+    },
+    goalseek: function(){
+        
+    },
+    replace: function(){
+        
+    },
+    replace_bulk: function(){
+        
+    },
+    value: function(){
+        
+    },
+    values: function(){
+        
+    },
+})
+
+var eventClass = Class("EventClass",{
+    
+});
+eventClass.extends(paloSubClass,false);
+eventClass.implements({
+    begin: function(){
+        
+    },
+    end: function(){
+        
+    },
+});
+
+var ruleClass = Class("RuleClass",{
+    
+});
+ruleClass.extends(paloSubClass,false);
+ruleClass.implements({
+    create: function(){
+        
+    },
+    destroy: function(){
+        
+    },
+    functions: function(){
+        
+    },
+    info: function(){
+        
+    },
+    modify: function(){
+        
+    },
+    parse: function(){
+        
+    },
+})
+
+var svsClass = Class("SvsClass",{
+    
+});
+svsClass.extends(paloSubClass,false);
+svsClass.implements({
+    info: function(){
+            
+    }
+});
+
