@@ -5,24 +5,39 @@ var MD5 = require('MD5');
 /*
  * GET home page.
  */
+var paloList = {};
 
-var palov = new palo.paloClass({
-    host: 'olap.rts-ugra.ru',
-    port: 7921,
-});
-    
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });
 };
 
 exports.login = function(req,res){
-    
     palov.server.info(null,function(err,result){
         res.send(result);
     });
 };
 
 exports.api = function(req,res){
+	/*var id = req.session.paloKey;
+	
+	if ((id===undefined)||(paloList[id]===undefined)){
+		var newKey = Math.random()*99999;
+		var newBase = new palo.paloClass({
+			host: 'olap.rts-ugra.ru',
+			port: 7921
+		});
+		req.session.paloKey = newKey;
+		paloList[newKey] = newBase;
+	}
+	
+	var palov=paloList[req.session.paloKey];
+	*/
+   var palov = new palo.paloClass({
+		host: 'olap.rts-ugra.ru',
+		port: 7921
+	});
+		
+		
     var e = req.params.entry;
     var r = req.params.request;
     if (palov[e][r]){

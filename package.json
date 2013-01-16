@@ -9,6 +9,8 @@
     "express": "3.0.5",
     "jade": "*",
     "stylus": "*",
-    "node-class": "*"
+    "node-class": "*",
+	"MD5": "*",
+	"redis": "*"
   }
 }

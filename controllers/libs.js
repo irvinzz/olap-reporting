@@ -6,7 +6,7 @@ var paloClass = Class("PaloClass",{
     host : 'localhost',
     port : '',
     sid : undefined,
-    ttl : undefined,
+    ttl : undefined
 });
 paloClass.implements({
     __construct: function(){
@@ -30,11 +30,11 @@ paloClass.implements({
             p+=k+'='+parameters[k];
             i++;
         }
-        console.log('accessing to :'+path+'?'+p+'&'+'sid='+(this.sid || ''));
+        console.log('accessing to :'+path+'?'+p);
         http.get({
             host:this.host,
             port:this.port,
-            path:path+'?'+p+'&'+'sid='+(this.sid || ''),
+            path:path+'?'+p
         },onResponse);
         
         function onResponse(res){
@@ -44,8 +44,16 @@ paloClass.implements({
             res.on('data',function(c){
                 r+=c;
             });
-            res.on('end',function(){
-                console.log(res.statusCode);
+            res.on('end',onEnd);
+			
+			function onEnd(){
+				var headers = {
+					"X-PALO-SV": res.headers["x-palo-sv"] || '',
+					"X-PALO-DB": res.headers["x-palo-db"] || '',
+					"X-PALO-DIM": res.headers["x-palo-dim"] || '',
+					"X-PALO-CB": res.headers["x-palo-cb"] || '',
+					"X-PALO-CC": res.headers["x-palo-cc"] || ''
+				};
                 if (res.statusCode===200){
                     var result=[];
                     var rs=r.split('\n');
@@ -59,18 +67,16 @@ paloClass.implements({
                             result.push(r2);
                         }
                     }
-                    if (result.length>1)
-                        callback(null,result);
-                    else
-                        callback(null,result[0]);
+					callback(null,{
+						headers: headers,
+						result: result
+					});
                 }else{
                     callback(res.statusCode,r);
                 }
-                
-            });
+			}
         }
-    },
-    
+    }
 });
 
 exports.paloServers = [];
@@ -139,7 +145,14 @@ serverClass.implements({
         });
     },
     logout: function(p,c){
-        this._sR(p,{f: 'logout',k: ['OK']},c);
+		var _this = this;
+        this._sR(p,{f: 'logout',k: ['OK']},function(err,result){
+			if (!err){
+				_this.palo.sid = null;
+				_this.palo.ttl = null;
+			}
+			c(err,result);
+		});
     },
     save: function(p,c){
         this._sR(p,{f:'save',k:['OK']},c);
