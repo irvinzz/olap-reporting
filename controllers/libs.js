@@ -547,11 +547,15 @@ var paloClass = Class("PaloClass",{
     sid : undefined,
     ttl : undefined
 });
+
 paloClass.implements({
 	call: function(e,r,req,c){
+		console.log(req);
 		this.hg('/'+e+'/'+r,req.query,entrySet[e][r].k,function(err,result){
-			var aR = entrySet[e][r].fn;
-			if (typeof(aR)===typeof(function(){})) aR(req,result);
+			if (!err){
+				var aR = entrySet[e][r].fn;
+				if (typeof(aR)===typeof(function(){})) aR(req,result);
+			}			
 			c(err,result);
 		});
 	},
