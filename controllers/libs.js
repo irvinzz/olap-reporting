@@ -2,6 +2,545 @@ var http = require("http");
 var Class = require('node-class').Class;
 var MD5 = require('MD5');
 
+var entrySet = {
+	server:{
+		databases: {					//	Shows the list of databases.
+			k:[ 
+				'database',
+				'name_database',
+				'number_dimensions',
+				'number_cubes',
+				'status',
+				'type',
+				'database_token',
+			]
+		},
+		info:{							//	Shows information about the server.
+			k:[
+				'major_version',
+				'minor_version',
+				'bugfix_version',
+				'build_number',
+				'encryption',
+				'https_port'
+			]
+		},
+		load:{							//	Loads the server data (does not load database or cube data).
+			k:['OK']
+		},
+		login:{							//	Login to server by user name and password.
+			k:[
+				'sid',
+				'ttl'
+			],
+			fn: function(req,result){	//	After login action
+				req.session.sid=result.result[0].sid;
+			}
+		},
+		logout:{						//	 	Logout the current user
+			k:['OK'],
+			fn: function(req,result){
+				req.sessino.sid = null;
+			}
+		},				
+		save:{k:['OK']},				//	Saves the server data (does not save database or cube data).
+		shutdown:{k:['OK']}				//	Shuts down server (does not save database or cube data).
+	},
+	database:{
+		cubes:{							//	Shows the list of cubes
+			k:[
+				'cube',
+				'name_cube',
+				'number_dimensions',
+				'dimensions',
+				'number_cells',
+				'number_filled_cells',
+				'status',
+				'type',
+				'cube_token'
+			]
+		},
+		create:{						//	Creates new database.
+			k:[
+				'database',					//	identifier	Identifier of the database
+				'name_database',			//	string		Name of the database
+				'number_dimensions',		//	integer		Number of dimensions in the database
+				'number_cubes',				//	integer		Number of cubes in the database
+				'status',					//	integer		Status of database (0=unloaded, 1=loaded and 2=changed)
+				'type'						//	integer		Type of database (0=normal, 1=system, 3=user info)
+			]
+		},
+		destroy:{						//	 	Deletes a database.
+			k:['OK']
+		},
+		dimensions:{					//		Shows the list of dimensions
+			k:[
+				'name_dimension',			//	string	Name of the dimension'
+				'number_elements',			//	integer	Number of elements
+				'maximum_level',			//	integer	Maximum level of the dimension
+				'maximum_indent',			//	integer	Maximum indent of the dimension
+				'maximum_depth',			//	integer	Maximum depth of the dimension
+				'type',						//	integer	Type of dimension (0=normal, 1=system, 2=attribute, 3=user info)
+				'attributes_dimension',		//	identifier	Identifier of the attributes dimension of a normal dimension or the identifier of the normal dimension associated to a attributes dimension.
+				'attributes_cube',			//	identifier	Identifier of the attributes cube. (only for normal dimensions)
+				'rights_cube',				//	identifier	Identifier of the rights cube. (only for normal dimensions)
+				'dimension_token',			//	integer	The dimension token of the dimension
+			]
+		},
+		info:{							//	 	Shows identifier, name, number of dimensions and number of cubes.
+			k:[
+				'database',					// 	identifier 	Identifier of the database
+				'name_database',			// 	string 	Name of the database
+				'number_dimensions',		// 	integer 	Number of dimensions in the database
+				'number_cubes',				// 	integer 	Number of cubes in the database
+				'status',					// 	integer 	Status of database (0=unloaded, 1=loaded and 2=changed)
+				'type',						// 	integer 	Type of database (0=normal, 1=system, 3=user info)
+				'database_token',			// 	integer 	The database token of the database
+			]
+		},
+		load:{k:['OK']},				//	Loads the database data.
+		rename:{						//	Renames a database
+			k:[
+				'database',					// 	identifier 	Identifier of the database
+				'name_database',			// 	string		Name of the database
+				'number_dimensions',		// 	integer 	Number of dimensions in the database
+				'number_cubes',				// 	integer 	Number of cubes in the database
+				'status',					// 	integer 	Status of database (0=unloaded, 1=loaded and 2=changed)
+				'type',						// 	integer 	Type of database (0=normal, 1=system)
+			]
+		},
+		save:{k:['OK']},				//	Saves the database data (does not save cube data).
+		unload:{k:['OK']}				//	Unloads the database, dimension and cube data from memory.
+	},
+	dimension:{
+		clear:{							//	Clears a dimension.
+			k:[
+				'dimension',				// 	 	identifier 	Identifier of the dimension
+				'name_dimension',			// 	 	string		Name of the dimension
+				'number_elements',			// 	 	integer 	Number of elements
+				'maximum_level',			// 	 	integer 	Maximum level of the dimension
+				'maximum_indent',			// 	 	integer 	Maximum indent of the dimension
+				'maximum_depth',			// 	 	integer 	Maximum depth of the dimension
+				'type',						// 	 	integer 	Type of dimension (0=normal, 1=system, 2=attribute)
+				'attributes_dimension',		// 	 	identifier 	Identifier of the attributes dimension of a normal dimension or the identifier of the normal dimension associated to a attributes dimension.
+				'attributes_cube',			// 	 	identifier 	Identifier of the attributes cube. (only for normal dimensions)
+				'rights_cube',				// 	 	identifier 	Identifier of the rights cube. (only for normal dimensions)
+				'dimension_token',			// 	 	integer 	The dimension token of the dimension
+			]
+		},
+		create:{
+			k:[
+				'dimension',				// 	 	 identifier Identifier of the dimension
+				'name_dimension',			// 	 	 string		Name of the dimension
+				'number_elements',			// 	 	 integer 	Number of elements
+				'maximum_level',			// 	 	 integer 	Maximum level of the dimension
+				'maximum_indent',			// 	 	 integer 	Maximum indent of the dimension
+				'maximum_depth',			// 	 	 integer 	Maximum depth of the dimension
+				'type',						// 	 	 integer	Type of dimension (0=normal, 1=system, 2=attribute, 3=user info)
+				'attributes_dimension',		// 	 	 identifier Identifier of the attributes dimension of a normal dimension or the identifier of the normal dimension associated to a attributes dimension.
+				'attributes_cube',			// 	 	 identifier Identifier of the attributes cube. (only for normal dimensions)
+				'rights_cube',				// 	 	 identifier Identifier of the rights cube. (only for normal dimensions)
+				'dimension_token',			// 	 	 integer 	The dimension token of the dimension
+			]
+		},
+		cubes:{
+			k:[
+				'cube',						// 	 	identifier 	Identifier of the cube
+				'name_cube',				// 	   	string		Name of the cube
+				'number_dimensions',		// 	   	integer 	Number of dimensions
+				'dimensions',				// 	   	identifier 	Comma separate list of dimension identifiers
+				'number_cells',				// 	   	integer 	Total number of cells
+				'number_filled_cells',		// 	   	integer 	Number of filled numeric base cells plus number of filled string cells
+				'status',					// 	   	integer 	Status of cube (0=unloaded, 1=loaded and 2=changed)
+				'type',						// 	   	integer 	Type of cube (0=normal, 1=system, 2=attribute, 3=user info, 4=gpu type)
+				'cube_token',				// 	   	integer 	The cube token of the cube
+			]
+		},
+		destroy:{k:['OK']},
+		element:{
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		elements:{
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	 	string 	Name of the element
+				'position',				// 	 	integer 	Position of the element
+				'level',				// 	 	integer 	Level of the element
+				'indent',				// 	 	integer 	Indent of the element
+				'depth',				// 	 	integer 	Depth of the element
+				'type',					// 	 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	 	integer 	Number of parents
+				'parents',				// 	 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	 	integer 	Number of children
+				'children',				// 	 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	 	double 	Comma separate list of children weight
+			]
+		},
+		info:{
+			k:[
+				'dimension',				// 	 	 	identifier 	Identifier of the dimension
+				'name_dimension',			// 	 	 	string 	Name of the dimension
+				'number_elements',			// 	 	 	integer 	Number of elements
+				'maximum_level',			// 	 	 	integer 	Maximum level of the dimension
+				'maximum_indent',			// 	 	 	integer 	Maximum indent of the dimension
+				'maximum_depth',			// 	 	 	integer 	Maximum depth of the dimension
+				'type',						// 	 	 	integer 	Type of dimension (0=normal, 1=system, 2=attribute, 3=user info)
+				'attributes_dimension',		// 	 	 	identifier 	Identifier of the attributes dimension of a normal dimension or the identifier of the normal dimension associated to a attributes dimension.
+				'attributes_cube',			// 	 	 	identifier 	Identifier of the attributes cube. (only for normal dimensions)
+				'rights_cube',				// 	 	 	identifier 	Identifier of the rights cube. (only for normal dimensions)
+				'dimension_token',			// 	 	 	integer 	The dimension token of the dimension
+			]
+		},
+		rename:{
+			k:[
+				'dimension',				// 	  	identifier 	Identifier of the dimension
+				'name_dimension',			// 	  	string 	Name of the dimension
+				'number_elements',			// 	  	integer 	Number of elements
+				'maximum_level',			// 	  	integer 	Maximum level of the dimension
+				'maximum_depth',			// 	  	integer 	Maximum depth of the dimension
+				'type',						// 	  	integer 	Type of dimension (0=normal, 1=system, 2=attribute, 3=user info)
+				'attributes_dimension',		// 	  	identifier 	Identifier of the attributes dimension of a normal dimension or the identifier of the normal dimension associated to a attributes dimension.
+				'attributes_cube',			// 	  	identifier 	Identifier of the attributes cube. (only for normal dimensions)
+				'rights_cube',				// 	  	identifier 	Identifier of the rights cube. (only for normal dimensions)
+				'dimension_token',			// 	  	integer 	The dimension token of the dimension
+			]
+		}
+	},
+	element:{
+		append: { // Adds children to consolidated elements.     dimension
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		create: { // Creates new element.     dimension
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		create_bulk: { // Creates multiple elements of the same type.     dimension
+			k:[]
+		},
+		destroy: { // Deletes an element.     dimension
+			k:['OK']
+		},
+		destroy_bulk: { // Delete list of elements.     dimension
+			k:['OK']
+		},
+		info: { // Shows identifer, name, position, level, depth, parents and children of an element.     dimension
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		move: { // Changes position of an element.     dimension
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		rename: { // Renames an element.     dimension
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		replace: { // Changes or creates a new element. Replaces children in consolidated elements.     dimension
+			k:[
+				'element',				// 	identifier 	Identifier of the element
+				'name_element',			// 	string 	Name of the element
+				'position',				// 	integer 	Position of the element
+				'level',				// 	integer 	Level of the element
+				'indent',				// 	integer 	Indent of the element
+				'depth',				// 	integer 	Depth of the element
+				'type',					// 	integer 	Type of the element (1=NUMERIC, 2=STRING, 4=CONSOLIDATED)
+				'number_parents',		// 	integer 	Number of parents
+				'parents',				// 	identifier 	Comma separate list of parent identifiers
+				'number_children',		// 	integer 	Number of children
+				'children',				// 	identifier 	Comma separate list of children identifiers
+				'weights',				// 	double 	Comma separate list of children weight
+			]
+		},
+		replace_bulk: {
+			k:['OK']
+		}
+	},
+	cubes:{
+		clear: {
+			k:[
+				'cube',					// 	identifier 	Identifier of the cube
+				'name_cube',			// 	string 	Name of the cube
+				'number_dimensions',	// 	integer 	Number of dimensions
+				'dimensions',			// 	identifier 	Comma separate list of dimension identifiers
+				'number_cells',			// 	integer 	Total number of cells
+				'number_filled_cells',	// 	integer 	Number of filled numeric base cells plus number of filled string cells
+				'status',				// 	integer 	Status of cube (0=unloaded, 1=loaded and 2=changed)
+				'type',					// 	integer 	Type of cube (0=normal, 1=system, 2=attribute, 3=user info, 4=gpu type)
+				'cube_token',			// 	integer 	The cube token of the cube
+			]
+		},
+		commit: {
+			k:['OK']
+		},
+		create: {
+			k:[
+				'cube',					//  	identifier 	Identifier of the cube
+				'name_cube',			//  	string 	Name of the cube
+				'number_dimensions',	//  	integer 	Number of dimensions
+				'dimensions',			//  	identifier 	Comma separate list of dimension identifiers
+				'number_cells',			//  	integer 	Total number of cells
+				'number_filled_cells',	//  	integer 	Number of filled numeric base cells plus number of filled string cells
+				'status',				//  	integer 	Status of cube (0=unloaded, 1=loaded and 2=changed)
+				'type',					//  	integer 	Type of cube (0=normal, 1=system, 2=attribute, 3=user info, 4=gpu type)
+				'cube_token',			//  	integer 	The cube token of the cube
+			]
+		},
+		convert: {
+			k:[
+				'cube',					// 	identifier 	Identifier of the cube
+				'name_cube',			// 	string 	Name of the cube
+				'number_dimensions',	// 	integer 	Number of dimensions
+				'dimensions',			// 	identifier 	Comma separate list of dimension identifiers
+				'number_cells',			// 	integer 	Total number of cells
+				'number_filled_cells',	// 	integer 	Number of filled numeric base cells plus number of filled string cells
+				'status',				// 	integer 	Status of cube (0=unloaded, 1=loaded and 2=changed)
+				'type',					// 	integer 	Type of cube (0=normal, 4=gpu type)
+				'cube_token',			// 	integer 	The cube token of the cube
+			]
+		},
+		destroy: {
+			k:['OK']
+		},
+		info: {
+			k:[
+				'cube',					// 	identifier 	Identifier of the cube
+				'name_cube',			// 	string 	Name of the cube
+				'number_dimensions',	// 	integer 	Number of dimensions
+				'dimensions',			// 	identifier 	Comma separate list of dimension identifiers
+				'number_cells',			// 	integer 	Total number of cells
+				'number_filled_cells',	// 	integer 	Number of filled numeric base cells plus number of filled string cells
+				'status',				// 	integer 	Status of cube (0=unloaded, 1=loaded and 2=changed)
+				'type',					// 	integer 	Type of cube (0=normal, 1=system, 2=attribute, 3=user info, 4=gpu type)
+				'cube_token',			// 	integer 	The cube token of the cube
+			]
+		},
+		load: {
+			k:['OK']
+		},
+		lock: {
+			k:[
+				'lock',					// 	integer 	Indentifier of the locked area
+				'area',					// 	area 	Comma separated list of element identifiers list. Each element identifiers list is colon separated. The area is the cartesian product.
+				'user',					// 	string 	The name of the user who locked the cube
+				'steps',				// 	integer 	Number of steps
+			]
+		},
+		locks: {
+			k:[
+				'lock',					//  	integer 	Indentifier of the locked area
+				'area',					//  	area 	Comma separated list of element identifiers list. Each element identifiers list is colon separated. The area is the cartesian product.
+				'user',					//  	string 	The name of the user who locked the cube
+				'steps',				//  	integer 	Number of steps
+			]
+		},
+		rename: {
+			k:[
+				'cube',					// 	identifier 	Identifier of the cube
+				'name_cube',			// 	string 	Name of the cube
+				'number_dimensions',	// 	integer 	Number of dimensions
+				'dimensions',			// 	identifier 	Comma separate list of dimension identifiers
+				'number_cells',			// 	integer 	Total number of cells
+				'number_filled_cells',	// 	integer 	Number of filled numeric base cells plus number of filled string cells
+				'status',				// 	integer 	Status of cube (0=unloaded, 1=loaded and 2=changed)
+				'type',					// 	integer 	Type of cube (0=normal, 1=system, 2=attribute, 3=user info, 4=gpu type)
+				'cube_token',			// 	integer 	The cube token of the cube
+			]
+		},
+		rollback: {
+			k:['OK']
+		},
+		rules: {
+			k:[
+				'rule',					// 	identifier 	Identifier of the rule
+				'rule_string',			// 	string 	Textual representation for the rule
+				'external_identifier',	// 	string 	external identifier of the rule
+				'comment',				// 	string 	comment for the rule
+				'timestamp',			// 	string 	creation time of the rule in seconds since 1970-01-01
+				'active',				// 	integer 	0=rule is not active, 1=rule is active
+			]
+		},
+		save: {k:['OK']},
+		unload: {k:['OK']}
+	},
+	cell:{
+		area: {
+			k:[
+				'type',					// 	integer 	Type of the value (1=NUMERIC, 2=STRING)
+				'exists',				// 	boolean 	1 if at least base cell for the path exists
+				'value',				// 	double/string 	Value of the cell
+				'path',					// 	path 	Comma separate list of element identifier (path of cube cell)
+				'rule',					// 	identifier 	Identifier of the rule, this cell values originates from or empty. Only available if show_rule is 1.
+				'lock_info',			// 	identifier 	Lock info (0 - cell is not locked, 1 - cell is locked by user wich sent request, 2 - cell is locked by another user). Only available if show_lock_info is 1.
+			]
+		},
+		copy: {k:['OK']},
+		drillthrough: {				//	Retrieves detailed data for a cube cell.
+			k:[
+				'resultset',			// 	string 	Comma separated component-values (columns) of resultset; First row: Component names of resultset-columns
+			]
+		},
+		'export': {					//	 	Exports cells.
+			k:[
+				'type',					// 	integer 	Type of the value (1=NUMERIC, 2=STRING)
+				'exists',				// 	boolean 	1 if at least base cell for the path exists
+				'value',				// 	double/string 	Value of the cell
+				'path',					// 	path 	Comma separate list of element identifier (path of cube cell)
+			]
+		},
+		goalseek: {k:['OK']},		//	Sets value of a cell and sister cells in a way that values of parent cells remain unchanged.
+		replace: {k:['OK']},		//	Sets value of a cube cell.
+		replace_bulk: {k:['OK']},	//		Sets values of cube cells.
+		value: {					//	Shows datatype and value of a cube cell.
+			k:[
+				'type',					//	integer 	Type of the value (1=NUMERIC, 2=STRING)
+				'exists',				//	boolean 	1 if at least one base cell for the path exists
+				'value',				//	double/string 	Value of the cell
+				'rule',					//	identifier 	Identifier of the rule, this cell values originates from or empty. Only available if show_rule is 1.
+				'lock_info',			//	identifier 	Lock info (0 - cell is not locked, 1 - cell is locked by user wich sent request, 2 - cell is locked by another user). Only available if show_lock_info is 1.
+			]
+		},
+		values: {					//	Shows datatype and value of a list of cube cells.
+			k:[
+				'type',					//	 	integer 	Type of the value (1=NUMERIC, 2=STRING, 99=ERROR)
+				'exists/error',			//	 	integer 	1 if at least base cell for the path exists. In case of an error the error code.
+				'value',				//	 	double/string 	Value of the cell. In case of an error the error message
+				'rule',					//	 	identifier 	Identifier of the rule, this cell values originates from or empty. Only available if show_rule is 1.
+				'lock_info',			//	 	identifier 	Lock info (0 - cell is not locked, 1 - cell is locked by user wich sent request, 2 - cell is locked by another user). Only available if show_lock_info is 1.
+			]
+		}
+	},
+	'events':{
+		begin: {k:['OK']},			//	Requests an exclusive lock.
+		end: {k:['OK']}				//	Releases an exclusive lock.
+	},
+	rules:{
+		create: {					//	Creates a new enterprise rule for a cube.
+			k:[
+				'rule',					//	 	 	identifier 	Identifier of the rule
+				'rule_string',			//	 	 	string 	Textual representation for the rule
+				'external_identifier',	//	 	 	string 	external identifier of the rule
+				'comment',				//	 	 	string 	comment for the rule
+				'timestamp',			//	 	 	string 	creation time of the rule in seconds since 1970-01-01
+				'active',				//	 	 	integer 	0=rule is not active, 1=rule is active
+			]
+		},
+		destroy: {k:['OK']},		//	Removes an enterprise rule from a cube.
+		functions: {				//			Lists all available functions
+			k:[
+				'xml_functions'			//			string 	XML representation of the functions.
+			]
+		},
+		info: {						//		Shows an enterprise rule of a cube.
+			k:[
+				'rule',					// 	identifier 	Identifier of the rule
+				'rule_string',			// 	string 	Textual representation for the rule
+				'external_identifier',	// 	string 	external identifier of the rule
+				'comment',				// 	string 	comment for the rule
+				'timestamp',			// 	string 	creation time of the rule in seconds since 1970-01-01
+				'active',				// 	integer 	0=rule is not active, 1=rule is active
+			]
+		},
+		modify: {					//	Modifies an enterprise rule of a cube.
+			k:[
+				'rule',					// 	identifier 	Identifier of the rule
+				'rule_string',			// 	string 	Textual representation for the rule
+				'external_identifier',	// 	string 	external identifier of the rule
+				'comment',				// 	string 	comment for the rule
+				'timestamp',			// 	string 	creation time of the rule in seconds since 1970-01-01
+				'active',				// 	integer 	0=rule is not active, 1=rule is active
+			]
+		},
+		parse: {					//	Parse an enterprise rule.
+			k:['xml_rule']				//string 	XML representation of the enterprise rule.
+		}
+	},
+	svs:{							//	 	Gets information about Supervision Server.
+		info: {
+            k:[
+				'svs_active',				// 	integer 	0 - not active, 1 - active
+				'login_mode',				// 	integer 	0 - none, 1 - information; 2 - authentification; 3 - authorization
+				'cube_worker_active',				// 	integer 	0 - not active, 1 - active
+				'drill_through_enabled',				// 	integer 	0 - disabled, 1 - enabled (switch in palo.ini)
+			]
+		}
+	}
+}
+
+
 var paloClass = Class("PaloClass",{
     host : 'localhost',
     port : '',
@@ -9,18 +548,13 @@ var paloClass = Class("PaloClass",{
     ttl : undefined
 });
 paloClass.implements({
-    __construct: function(){
-        var c = this;
-        this.server = new serverClass(c);
-        this.database = new databaseClass(c);
-        this.dimension = new dimensionClass(c);
-        this.element = new elementClass(c);
-        this.cube = new cubeClass(c);
-        this.cell = new cellClass(c);
-        this.event = new eventClass(c);
-        this.rule = new ruleClass(c);
-        this.svs = new svsClass(c);
-    },
+	call: function(e,r,req,c){
+		this.hg('/'+e+'/'+r,req.query,entrySet[e][r].k,function(err,result){
+			var aR = entrySet[e][r].fn;
+			if (typeof(aR)===typeof(function(){})) aR(req,result);
+			c(err,result);
+		});
+	},
     hg: function (path,parameters,results,callback){
         var r='';
         var p='';
@@ -30,11 +564,13 @@ paloClass.implements({
             p+=k+'='+parameters[k];
             i++;
         }
-        console.log('accessing to :'+path+'?'+p);
+		
+		var fullpath = path+'?'+p;
+		if (this.sid) fullpath+='&sid='+this.sid;
         http.get({
             host:this.host,
             port:this.port,
-            path:path+'?'+p
+            path:fullpath
         },onResponse);
         
         function onResponse(res){
@@ -72,7 +608,8 @@ paloClass.implements({
 						result: result
 					});
                 }else{
-                    callback(res.statusCode,r);
+					var r1e = r.split(';');
+                    callback(res.statusCode,r1e);
                 }
 			}
         }
@@ -82,356 +619,3 @@ paloClass.implements({
 exports.paloServers = [];
 
 exports.paloClass = paloClass;
-
-var paloSubClass = Class("PaloSubClass",{
-});
-paloSubClass.implements({
-    __construct: function (p){
-        this.palo = p;
-    }
-});
-
-var serverClass = Class("ServerClass",{
-});
-serverClass.extends(paloSubClass,false);
-serverClass.implements({
-    _sR: function(params,diff,callback){
-        this.palo.hg(
-            '/server/'+diff.f,
-            params,
-            diff.k,
-            callback
-        );
-    },
-    databases : function(params,callback){
-        this._sR(
-            params,
-            {
-                f: 'databases',
-                k: [
-                    'database',
-                    'name_database',
-                    'number_dimensions',
-                    'number_cubes',
-                    'status',
-                    'type',
-                    'database_token',
-                ]
-            },
-            callback
-        );
-    },
-    info: function(p,c){
-        this._sR(
-            null,
-            {
-                f:'info',
-                k:['major_version','minor_version','bugfix_version','build_number','encryption','https_port']
-            },
-            c
-        );
-    },
-    load:function(p,c){
-        this._sR(p,{f: 'load',k: ['OK']},c);
-    },
-    login: function(p,c){
-        var _this=this;
-        this._sR(p,{f: 'login',k: ['sid','ttl']},function(err,result){
-            if (!err){
-                _this.palo.sid = result.sid;
-                _this.palo.ttl = result.ttl;
-            }
-            c(err,result);
-        });
-    },
-    logout: function(p,c){
-        var _this = this;
-        this._sR(p,{f: 'logout',k: ['OK']},function(err,result){
-            if (!err){
-                _this.palo.sid = null;
-                _this.palo.ttl = null;
-            }
-            c(err,result);
-        });
-    },
-    save: function(p,c){
-        this._sR(p,{f:'save',k:['OK']},c);
-    },
-    shutdown: function(p,c){
-        this._sR(p,{f:'shutdows',k:['OK']},c);
-    }
-});
-
-var databaseClass = Class("DatabaseClass",{
-    
-});
-databaseClass.extends(paloSubClass,false);
-databaseClass.implements({
-    sr: function(params,diff,callback){
-        this.palo.hg(
-            '/database/'+diff.f,
-            params,
-            diff.k,
-            callback
-        );
-    },
-    /*
-     * 
-     * 
-     * 0	cube	identifier	Identifier of the cube
-1	name_cube	string	Name of the cube
-2	number_dimensions	integer	Number of dimensions
-3	dimensions	integer	Comma separate list of dimension identifiers
-4	number_cells	integer	Total number of cells
-5	number_filled_cells	integer	Number of filled numeric base cells plus number of filled string cells
-6	status	integer	Status of cube (0=unloaded, 1=loaded and 2=changed)
-7	type	integer	Type of cube (0=normal, 1=system, 2=attribute, 3=user info, 4=gpu type)
-8	cube_token
-     */
-    cubes: function(p,c){
-        this.sr(p,{f:'cubes',k:['cube','name_cube','number_dimensions','dimensions','number_cells','number_filled_cells','status','type','cube_token']},c)
-    },
-    create: function(){
-        
-    },
-    destroy: function(){
-        
-    },
-    dimensions: function(p,c){
-        this.sr(
-            p,
-            {
-                f: 'dimensions',
-                k:[
-                    'name_dimension',   //  string	Name of the dimension'
-                    'number_elements',  //  integer	Number of elements
-                    'maximum_level',    //  integer	Maximum level of the dimension
-                    'maximum_indent',   //  integer	Maximum indent of the dimension
-                    'maximum_depth',    //  integer	Maximum depth of the dimension
-                    'type',             //  integer	Type of dimension (0=normal, 1=system, 2=attribute, 3=user info)
-                    'attributes_dimension', //  identifier	Identifier of the attributes dimension of a normal dimension or the identifier of the normal dimension associated to a attributes dimension.
-                    'attributes_cube',  //  identifier	Identifier of the attributes cube. (only for normal dimensions)
-                    'rights_cube',      //  identifier	Identifier of the rights cube. (only for normal dimensions)
-                    'dimension_token',  //  integer	The dimension token of the dimension
-                ]
-            },
-            c
-        )
-    },
-
-    info: function(){
-        
-    },
-    load: function(){
-        
-    },
-    rename: function(){
-        
-    },
-    save: function(){
-        
-    },
-    unload: function(){
-        
-    }
-});
-
-var dimensionClass = Class("DimensionClass",{
-    
-});
-dimensionClass.extends(paloSubClass,false);
-dimensionClass.implements({
-    clear: function(){
-            
-    },
-    create: function(){
-        
-    },
-    cubes: function(){
-        
-    },
-    destroy: function(){
-        
-    },
-    element: function(){
-        
-    },
-    elements: function(){
-        
-    },
-    info: function(){
-        
-    },
-    rename: function(){
-        
-    },
-});
-
-var elementClass = Class("ElementClass",{
-    
-});
-elementClass.extends(paloSubClass,false);
-elementClass.implements({
-    append: function(){ // Adds children to consolidated elements.     dimension
-                
-    },
-    create: function(){ // Creates new element.     dimension
-        
-    },
-    create_bulk: function(){ // Creates multiple elements of the same type.     dimension
-        
-    },
-    destroy: function(){ // Deletes an element.     dimension
-        
-    },
-    destroy_bulk: function(){ // Delete list of elements.     dimension
-        
-    },
-    info: function(){ // Shows identifer, name, position, level, depth, parents and children of an element.     dimension
-        
-    },
-    move: function(){ // Changes position of an element.     dimension
-        
-    },
-    rename: function(){ // Renames an element.     dimension
-        
-    },
-    replace: function(){ // Changes or creates a new element. Replaces children in consolidated elements.     dimension
-        
-    },
-    replace_bulk: function(){
-        
-    },
-});
-
-var cubeClass = Class("CubeClass",{
-    
-});
-cubeClass.extends(paloSubClass,false);
-cubeClass.implements({
-    clear: function(){
-                
-    },
-    commit: function(){
-        
-    },
-    create: function(){
-        
-    },
-    convert: function(){
-        
-    },
-    destroy: function(){
-        
-    },
-    info: function(){
-        
-    },
-    load: function(){
-        
-    },
-    lock: function(){
-        
-    },
-    locks: function(){
-        
-    },
-    rename: function(){
-        
-    },
-    rollback: function(){
-        
-    },
-    rules: function(){
-        
-    },
-    save: function(){
-        
-    },
-    unload: function(){
-        
-    },
-})
-
-var cellClass = Class("CellClass",{
-    
-});
-cellClass.extends(paloSubClass,false);
-cellClass.implements({
-    area: function(){
-            
-    },
-    copy: function(){
-        
-    },
-    drillthrough: function(){
-        
-    },
-    export: function(){
-        
-    },
-    goalseek: function(){
-        
-    },
-    replace: function(){
-        
-    },
-    replace_bulk: function(){
-        
-    },
-    value: function(){
-        
-    },
-    values: function(){
-        
-    },
-})
-
-var eventClass = Class("EventClass",{
-    
-});
-eventClass.extends(paloSubClass,false);
-eventClass.implements({
-    begin: function(){
-        
-    },
-    end: function(){
-        
-    },
-});
-
-var ruleClass = Class("RuleClass",{
-    
-});
-ruleClass.extends(paloSubClass,false);
-ruleClass.implements({
-    create: function(){
-        
-    },
-    destroy: function(){
-        
-    },
-    functions: function(){
-        
-    },
-    info: function(){
-        
-    },
-    modify: function(){
-        
-    },
-    parse: function(){
-        
-    },
-})
-
-var svsClass = Class("SvsClass",{
-    
-});
-svsClass.extends(paloSubClass,false);
-svsClass.implements({
-    info: function(){
-            
-    }
-});
-
