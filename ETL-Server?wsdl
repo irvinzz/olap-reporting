@@ -1,0 +1,1918 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://ns.jedox.com/ETL-Server" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax21="http://service.etl.jedox.com/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://ns.jedox.com/ETL-Server">
+    <wsdl:documentation>ETL-Server</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.etl.jedox.com/xsd">
+            <xs:complexType name="ComponentDependencyDescriptor">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="components" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ComponentTypeDescriptor">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="caption" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="classname" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="schema" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="scope" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="tree" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Variable">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ExecutionDescriptor">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="errorMessage" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="errors" type="xs:int"/>
+                    <xs:element minOccurs="0" name="id" nillable="true" type="xs:long"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="metadata" nillable="true" type="ax21:ComponentOutputDescriptor"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="project" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="result" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="startDate" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="status" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="statusCode" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="stopDate" nillable="true" type="xs:long"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="valid" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="warnings" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ComponentOutputDescriptor">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="defaultValue" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="originalName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="position" type="xs:int"/>
+                    <xs:element minOccurs="0" name="role" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ResultDescriptor">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="errorMessage" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="result" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="valid" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ServerStatus">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="autosaving" type="xs:boolean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="datastores" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="freeMemory" type="xs:long"/>
+                    <xs:element minOccurs="0" name="logLevel" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="maxMemory" type="xs:long"/>
+                    <xs:element minOccurs="0" name="processorsAvailable" type="xs:int"/>
+                    <xs:element minOccurs="0" name="runningExecutions" type="xs:int"/>
+                    <xs:element minOccurs="0" name="totalMemory" type="xs:long"/>
+                    <xs:element minOccurs="0" name="validating" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax22="http://service.etl.jedox.com/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://ns.jedox.com/ETL-Server">
+            <xs:import namespace="http://service.etl.jedox.com/xsd"/>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="getComponentDependencies">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentDependenciesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ComponentDependencyDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentDependents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentDependentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ComponentDependencyDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentTypes">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="scope" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentTypesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ComponentTypeDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addExecution">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="variables" nillable="true" type="ax22:Variable"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addExecutionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentOutputs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="variables" nillable="true" type="ax22:Variable"/>
+                        <xs:element minOccurs="0" name="view" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="waitForTermination" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentOutputsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="variables" nillable="true" type="ax22:Variable"/>
+                        <xs:element minOccurs="0" name="view" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="lines" type="xs:int"/>
+                        <xs:element minOccurs="0" name="waitForTermination" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionStatus">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="id" type="xs:long"/>
+                        <xs:element minOccurs="0" name="waitForTermination" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionStatusResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="prepareData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="variables" nillable="true" type="ax22:Variable"/>
+                        <xs:element minOccurs="0" name="view" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="lines" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="prepareDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="runExecution">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="id" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="runExecutionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="stopExecution">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="id" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="stopExecutionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="testComponent">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="variables" nillable="true" type="ax22:Variable"/>
+                        <xs:element minOccurs="0" name="waitForTermination" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="testComponentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionHistory">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="project" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="after" type="xs:long"/>
+                        <xs:element minOccurs="0" name="before" type="xs:long"/>
+                        <xs:element minOccurs="0" name="status" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionHistoryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeExecutions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ids" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeExecutionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ExecutionDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillThrough">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="datastore" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="names" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="lengths" type="xs:int"/>
+                        <xs:element minOccurs="0" name="lines" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="drillThroughResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="fetchData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="datastore" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="offset" type="xs:int"/>
+                        <xs:element minOccurs="0" name="lines" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="fetchDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionLog">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="id" type="xs:long"/>
+                        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="timestamp" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getExecutionLogResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapCubeDimensions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="cube" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mask" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapCubeDimensionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapCubes">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mask" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapCubesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapDatabases">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mask" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapDatabasesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapDimensions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="mask" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOlapDimensionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalCatalogs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalCatalogsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalColumns">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="catalogPattern" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="schemaPattern" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tablePattern" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="columnPattern" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalColumnsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalSchemas">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalSchemasResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalTables">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="catalogPattern" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="schemaPattern" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tablePattern" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="types" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRelationalTablesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="save">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="uploadFile">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="uploadFileResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addComponents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="locators" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="configs" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addComponentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentConfigs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="locators" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getComponentConfigsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="migrateComponents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="configs" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="migrateComponentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeComponents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="locators" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeComponentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="validateComponents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="locators" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="configs" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="validateComponentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax22:ResultDescriptor"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServerStatusResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:ServerStatus"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getLocators">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getLocatorsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getNames">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="locator" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getScopesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getLocatorsRequest">
+        <wsdl:part name="parameters" element="ns:getLocators"/>
+    </wsdl:message>
+    <wsdl:message name="getLocatorsResponse">
+        <wsdl:part name="parameters" element="ns:getLocatorsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getServerStatusRequest"/>
+    <wsdl:message name="getServerStatusResponse">
+        <wsdl:part name="parameters" element="ns:getServerStatusResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentDependenciesRequest">
+        <wsdl:part name="parameters" element="ns:getComponentDependencies"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentDependenciesResponse">
+        <wsdl:part name="parameters" element="ns:getComponentDependenciesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalTablesRequest">
+        <wsdl:part name="parameters" element="ns:getRelationalTables"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalTablesResponse">
+        <wsdl:part name="parameters" element="ns:getRelationalTablesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapCubesRequest">
+        <wsdl:part name="parameters" element="ns:getOlapCubes"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapCubesResponse">
+        <wsdl:part name="parameters" element="ns:getOlapCubesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="validateComponentsRequest">
+        <wsdl:part name="parameters" element="ns:validateComponents"/>
+    </wsdl:message>
+    <wsdl:message name="validateComponentsResponse">
+        <wsdl:part name="parameters" element="ns:validateComponentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="saveRequest">
+        <wsdl:part name="parameters" element="ns:save"/>
+    </wsdl:message>
+    <wsdl:message name="saveResponse">
+        <wsdl:part name="parameters" element="ns:saveResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalSchemasRequest">
+        <wsdl:part name="parameters" element="ns:getRelationalSchemas"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalSchemasResponse">
+        <wsdl:part name="parameters" element="ns:getRelationalSchemasResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalCatalogsRequest">
+        <wsdl:part name="parameters" element="ns:getRelationalCatalogs"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalCatalogsResponse">
+        <wsdl:part name="parameters" element="ns:getRelationalCatalogsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentConfigsRequest">
+        <wsdl:part name="parameters" element="ns:getComponentConfigs"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentConfigsResponse">
+        <wsdl:part name="parameters" element="ns:getComponentConfigsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDataRequest">
+        <wsdl:part name="parameters" element="ns:getData"/>
+    </wsdl:message>
+    <wsdl:message name="getDataResponse">
+        <wsdl:part name="parameters" element="ns:getDataResponse"/>
+    </wsdl:message>
+    <wsdl:message name="drillThroughRequest">
+        <wsdl:part name="parameters" element="ns:drillThrough"/>
+    </wsdl:message>
+    <wsdl:message name="drillThroughResponse">
+        <wsdl:part name="parameters" element="ns:drillThroughResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentDependentsRequest">
+        <wsdl:part name="parameters" element="ns:getComponentDependents"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentDependentsResponse">
+        <wsdl:part name="parameters" element="ns:getComponentDependentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionLogRequest">
+        <wsdl:part name="parameters" element="ns:getExecutionLog"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionLogResponse">
+        <wsdl:part name="parameters" element="ns:getExecutionLogResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentTypesRequest">
+        <wsdl:part name="parameters" element="ns:getComponentTypes"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentTypesResponse">
+        <wsdl:part name="parameters" element="ns:getComponentTypesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addComponentsRequest">
+        <wsdl:part name="parameters" element="ns:addComponents"/>
+    </wsdl:message>
+    <wsdl:message name="addComponentsResponse">
+        <wsdl:part name="parameters" element="ns:addComponentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="testComponentRequest">
+        <wsdl:part name="parameters" element="ns:testComponent"/>
+    </wsdl:message>
+    <wsdl:message name="testComponentResponse">
+        <wsdl:part name="parameters" element="ns:testComponentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="migrateComponentsRequest">
+        <wsdl:part name="parameters" element="ns:migrateComponents"/>
+    </wsdl:message>
+    <wsdl:message name="migrateComponentsResponse">
+        <wsdl:part name="parameters" element="ns:migrateComponentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="runExecutionRequest">
+        <wsdl:part name="parameters" element="ns:runExecution"/>
+    </wsdl:message>
+    <wsdl:message name="runExecutionResponse">
+        <wsdl:part name="parameters" element="ns:runExecutionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="removeComponentsRequest">
+        <wsdl:part name="parameters" element="ns:removeComponents"/>
+    </wsdl:message>
+    <wsdl:message name="removeComponentsResponse">
+        <wsdl:part name="parameters" element="ns:removeComponentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="removeExecutionsRequest">
+        <wsdl:part name="parameters" element="ns:removeExecutions"/>
+    </wsdl:message>
+    <wsdl:message name="removeExecutionsResponse">
+        <wsdl:part name="parameters" element="ns:removeExecutionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionHistoryRequest">
+        <wsdl:part name="parameters" element="ns:getExecutionHistory"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionHistoryResponse">
+        <wsdl:part name="parameters" element="ns:getExecutionHistoryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentOutputsRequest">
+        <wsdl:part name="parameters" element="ns:getComponentOutputs"/>
+    </wsdl:message>
+    <wsdl:message name="getComponentOutputsResponse">
+        <wsdl:part name="parameters" element="ns:getComponentOutputsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="fetchDataRequest">
+        <wsdl:part name="parameters" element="ns:fetchData"/>
+    </wsdl:message>
+    <wsdl:message name="fetchDataResponse">
+        <wsdl:part name="parameters" element="ns:fetchDataResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalColumnsRequest">
+        <wsdl:part name="parameters" element="ns:getRelationalColumns"/>
+    </wsdl:message>
+    <wsdl:message name="getRelationalColumnsResponse">
+        <wsdl:part name="parameters" element="ns:getRelationalColumnsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getNamesRequest">
+        <wsdl:part name="parameters" element="ns:getNames"/>
+    </wsdl:message>
+    <wsdl:message name="getNamesResponse">
+        <wsdl:part name="parameters" element="ns:getNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapCubeDimensionsRequest">
+        <wsdl:part name="parameters" element="ns:getOlapCubeDimensions"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapCubeDimensionsResponse">
+        <wsdl:part name="parameters" element="ns:getOlapCubeDimensionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionStatusRequest">
+        <wsdl:part name="parameters" element="ns:getExecutionStatus"/>
+    </wsdl:message>
+    <wsdl:message name="getExecutionStatusResponse">
+        <wsdl:part name="parameters" element="ns:getExecutionStatusResponse"/>
+    </wsdl:message>
+    <wsdl:message name="prepareDataRequest">
+        <wsdl:part name="parameters" element="ns:prepareData"/>
+    </wsdl:message>
+    <wsdl:message name="prepareDataResponse">
+        <wsdl:part name="parameters" element="ns:prepareDataResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getScopesRequest"/>
+    <wsdl:message name="getScopesResponse">
+        <wsdl:part name="parameters" element="ns:getScopesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addExecutionRequest">
+        <wsdl:part name="parameters" element="ns:addExecution"/>
+    </wsdl:message>
+    <wsdl:message name="addExecutionResponse">
+        <wsdl:part name="parameters" element="ns:addExecutionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="stopExecutionRequest">
+        <wsdl:part name="parameters" element="ns:stopExecution"/>
+    </wsdl:message>
+    <wsdl:message name="stopExecutionResponse">
+        <wsdl:part name="parameters" element="ns:stopExecutionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="uploadFileRequest">
+        <wsdl:part name="parameters" element="ns:uploadFile"/>
+    </wsdl:message>
+    <wsdl:message name="uploadFileResponse">
+        <wsdl:part name="parameters" element="ns:uploadFileResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapDimensionsRequest">
+        <wsdl:part name="parameters" element="ns:getOlapDimensions"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapDimensionsResponse">
+        <wsdl:part name="parameters" element="ns:getOlapDimensionsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapDatabasesRequest">
+        <wsdl:part name="parameters" element="ns:getOlapDatabases"/>
+    </wsdl:message>
+    <wsdl:message name="getOlapDatabasesResponse">
+        <wsdl:part name="parameters" element="ns:getOlapDatabasesResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="ETL-ServerPortType">
+        <wsdl:operation name="getLocators">
+            <wsdl:input message="ns:getLocatorsRequest" wsaw:Action="urn:getLocators"/>
+            <wsdl:output message="ns:getLocatorsResponse" wsaw:Action="urn:getLocatorsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatus">
+            <wsdl:input message="ns:getServerStatusRequest" wsaw:Action="urn:getServerStatus"/>
+            <wsdl:output message="ns:getServerStatusResponse" wsaw:Action="urn:getServerStatusResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependencies">
+            <wsdl:input message="ns:getComponentDependenciesRequest" wsaw:Action="urn:getComponentDependencies"/>
+            <wsdl:output message="ns:getComponentDependenciesResponse" wsaw:Action="urn:getComponentDependenciesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalTables">
+            <wsdl:input message="ns:getRelationalTablesRequest" wsaw:Action="urn:getRelationalTables"/>
+            <wsdl:output message="ns:getRelationalTablesResponse" wsaw:Action="urn:getRelationalTablesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubes">
+            <wsdl:input message="ns:getOlapCubesRequest" wsaw:Action="urn:getOlapCubes"/>
+            <wsdl:output message="ns:getOlapCubesResponse" wsaw:Action="urn:getOlapCubesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="validateComponents">
+            <wsdl:input message="ns:validateComponentsRequest" wsaw:Action="urn:validateComponents"/>
+            <wsdl:output message="ns:validateComponentsResponse" wsaw:Action="urn:validateComponentsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="save">
+            <wsdl:input message="ns:saveRequest" wsaw:Action="urn:save"/>
+            <wsdl:output message="ns:saveResponse" wsaw:Action="urn:saveResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalSchemas">
+            <wsdl:input message="ns:getRelationalSchemasRequest" wsaw:Action="urn:getRelationalSchemas"/>
+            <wsdl:output message="ns:getRelationalSchemasResponse" wsaw:Action="urn:getRelationalSchemasResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalCatalogs">
+            <wsdl:input message="ns:getRelationalCatalogsRequest" wsaw:Action="urn:getRelationalCatalogs"/>
+            <wsdl:output message="ns:getRelationalCatalogsResponse" wsaw:Action="urn:getRelationalCatalogsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentConfigs">
+            <wsdl:input message="ns:getComponentConfigsRequest" wsaw:Action="urn:getComponentConfigs"/>
+            <wsdl:output message="ns:getComponentConfigsResponse" wsaw:Action="urn:getComponentConfigsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getData">
+            <wsdl:input message="ns:getDataRequest" wsaw:Action="urn:getData"/>
+            <wsdl:output message="ns:getDataResponse" wsaw:Action="urn:getDataResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="drillThrough">
+            <wsdl:input message="ns:drillThroughRequest" wsaw:Action="urn:drillThrough"/>
+            <wsdl:output message="ns:drillThroughResponse" wsaw:Action="urn:drillThroughResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependents">
+            <wsdl:input message="ns:getComponentDependentsRequest" wsaw:Action="urn:getComponentDependents"/>
+            <wsdl:output message="ns:getComponentDependentsResponse" wsaw:Action="urn:getComponentDependentsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionLog">
+            <wsdl:input message="ns:getExecutionLogRequest" wsaw:Action="urn:getExecutionLog"/>
+            <wsdl:output message="ns:getExecutionLogResponse" wsaw:Action="urn:getExecutionLogResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentTypes">
+            <wsdl:input message="ns:getComponentTypesRequest" wsaw:Action="urn:getComponentTypes"/>
+            <wsdl:output message="ns:getComponentTypesResponse" wsaw:Action="urn:getComponentTypesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="addComponents">
+            <wsdl:input message="ns:addComponentsRequest" wsaw:Action="urn:addComponents"/>
+            <wsdl:output message="ns:addComponentsResponse" wsaw:Action="urn:addComponentsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="testComponent">
+            <wsdl:input message="ns:testComponentRequest" wsaw:Action="urn:testComponent"/>
+            <wsdl:output message="ns:testComponentResponse" wsaw:Action="urn:testComponentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="migrateComponents">
+            <wsdl:input message="ns:migrateComponentsRequest" wsaw:Action="urn:migrateComponents"/>
+            <wsdl:output message="ns:migrateComponentsResponse" wsaw:Action="urn:migrateComponentsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="runExecution">
+            <wsdl:input message="ns:runExecutionRequest" wsaw:Action="urn:runExecution"/>
+            <wsdl:output message="ns:runExecutionResponse" wsaw:Action="urn:runExecutionResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="removeComponents">
+            <wsdl:input message="ns:removeComponentsRequest" wsaw:Action="urn:removeComponents"/>
+            <wsdl:output message="ns:removeComponentsResponse" wsaw:Action="urn:removeComponentsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="removeExecutions">
+            <wsdl:input message="ns:removeExecutionsRequest" wsaw:Action="urn:removeExecutions"/>
+            <wsdl:output message="ns:removeExecutionsResponse" wsaw:Action="urn:removeExecutionsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionHistory">
+            <wsdl:input message="ns:getExecutionHistoryRequest" wsaw:Action="urn:getExecutionHistory"/>
+            <wsdl:output message="ns:getExecutionHistoryResponse" wsaw:Action="urn:getExecutionHistoryResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentOutputs">
+            <wsdl:input message="ns:getComponentOutputsRequest" wsaw:Action="urn:getComponentOutputs"/>
+            <wsdl:output message="ns:getComponentOutputsResponse" wsaw:Action="urn:getComponentOutputsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="fetchData">
+            <wsdl:input message="ns:fetchDataRequest" wsaw:Action="urn:fetchData"/>
+            <wsdl:output message="ns:fetchDataResponse" wsaw:Action="urn:fetchDataResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalColumns">
+            <wsdl:input message="ns:getRelationalColumnsRequest" wsaw:Action="urn:getRelationalColumns"/>
+            <wsdl:output message="ns:getRelationalColumnsResponse" wsaw:Action="urn:getRelationalColumnsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getNames">
+            <wsdl:input message="ns:getNamesRequest" wsaw:Action="urn:getNames"/>
+            <wsdl:output message="ns:getNamesResponse" wsaw:Action="urn:getNamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubeDimensions">
+            <wsdl:input message="ns:getOlapCubeDimensionsRequest" wsaw:Action="urn:getOlapCubeDimensions"/>
+            <wsdl:output message="ns:getOlapCubeDimensionsResponse" wsaw:Action="urn:getOlapCubeDimensionsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionStatus">
+            <wsdl:input message="ns:getExecutionStatusRequest" wsaw:Action="urn:getExecutionStatus"/>
+            <wsdl:output message="ns:getExecutionStatusResponse" wsaw:Action="urn:getExecutionStatusResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="prepareData">
+            <wsdl:input message="ns:prepareDataRequest" wsaw:Action="urn:prepareData"/>
+            <wsdl:output message="ns:prepareDataResponse" wsaw:Action="urn:prepareDataResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getScopes">
+            <wsdl:input message="ns:getScopesRequest" wsaw:Action="urn:getScopes"/>
+            <wsdl:output message="ns:getScopesResponse" wsaw:Action="urn:getScopesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="addExecution">
+            <wsdl:input message="ns:addExecutionRequest" wsaw:Action="urn:addExecution"/>
+            <wsdl:output message="ns:addExecutionResponse" wsaw:Action="urn:addExecutionResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="stopExecution">
+            <wsdl:input message="ns:stopExecutionRequest" wsaw:Action="urn:stopExecution"/>
+            <wsdl:output message="ns:stopExecutionResponse" wsaw:Action="urn:stopExecutionResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="uploadFile">
+            <wsdl:input message="ns:uploadFileRequest" wsaw:Action="urn:uploadFile"/>
+            <wsdl:output message="ns:uploadFileResponse" wsaw:Action="urn:uploadFileResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDimensions">
+            <wsdl:input message="ns:getOlapDimensionsRequest" wsaw:Action="urn:getOlapDimensions"/>
+            <wsdl:output message="ns:getOlapDimensionsResponse" wsaw:Action="urn:getOlapDimensionsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDatabases">
+            <wsdl:input message="ns:getOlapDatabasesRequest" wsaw:Action="urn:getOlapDatabases"/>
+            <wsdl:output message="ns:getOlapDatabasesResponse" wsaw:Action="urn:getOlapDatabasesResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ETL-ServerSoap11Binding" type="ns:ETL-ServerPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getLocators">
+            <soap:operation soapAction="urn:getLocators" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatus">
+            <soap:operation soapAction="urn:getServerStatus" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependencies">
+            <soap:operation soapAction="urn:getComponentDependencies" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubes">
+            <soap:operation soapAction="urn:getOlapCubes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalTables">
+            <soap:operation soapAction="urn:getRelationalTables" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="validateComponents">
+            <soap:operation soapAction="urn:validateComponents" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalSchemas">
+            <soap:operation soapAction="urn:getRelationalSchemas" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="save">
+            <soap:operation soapAction="urn:save" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalCatalogs">
+            <soap:operation soapAction="urn:getRelationalCatalogs" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentConfigs">
+            <soap:operation soapAction="urn:getComponentConfigs" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getData">
+            <soap:operation soapAction="urn:getData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependents">
+            <soap:operation soapAction="urn:getComponentDependents" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="drillThrough">
+            <soap:operation soapAction="urn:drillThrough" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionLog">
+            <soap:operation soapAction="urn:getExecutionLog" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentTypes">
+            <soap:operation soapAction="urn:getComponentTypes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testComponent">
+            <soap:operation soapAction="urn:testComponent" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addComponents">
+            <soap:operation soapAction="urn:addComponents" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="runExecution">
+            <soap:operation soapAction="urn:runExecution" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="migrateComponents">
+            <soap:operation soapAction="urn:migrateComponents" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeComponents">
+            <soap:operation soapAction="urn:removeComponents" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeExecutions">
+            <soap:operation soapAction="urn:removeExecutions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentOutputs">
+            <soap:operation soapAction="urn:getComponentOutputs" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionHistory">
+            <soap:operation soapAction="urn:getExecutionHistory" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="fetchData">
+            <soap:operation soapAction="urn:fetchData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalColumns">
+            <soap:operation soapAction="urn:getRelationalColumns" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getNames">
+            <soap:operation soapAction="urn:getNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubeDimensions">
+            <soap:operation soapAction="urn:getOlapCubeDimensions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="prepareData">
+            <soap:operation soapAction="urn:prepareData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionStatus">
+            <soap:operation soapAction="urn:getExecutionStatus" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getScopes">
+            <soap:operation soapAction="urn:getScopes" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addExecution">
+            <soap:operation soapAction="urn:addExecution" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="stopExecution">
+            <soap:operation soapAction="urn:stopExecution" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDimensions">
+            <soap:operation soapAction="urn:getOlapDimensions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="uploadFile">
+            <soap:operation soapAction="urn:uploadFile" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDatabases">
+            <soap:operation soapAction="urn:getOlapDatabases" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ETL-ServerSoap12Binding" type="ns:ETL-ServerPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getLocators">
+            <soap12:operation soapAction="urn:getLocators" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatus">
+            <soap12:operation soapAction="urn:getServerStatus" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependencies">
+            <soap12:operation soapAction="urn:getComponentDependencies" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubes">
+            <soap12:operation soapAction="urn:getOlapCubes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalTables">
+            <soap12:operation soapAction="urn:getRelationalTables" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="validateComponents">
+            <soap12:operation soapAction="urn:validateComponents" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalSchemas">
+            <soap12:operation soapAction="urn:getRelationalSchemas" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="save">
+            <soap12:operation soapAction="urn:save" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalCatalogs">
+            <soap12:operation soapAction="urn:getRelationalCatalogs" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentConfigs">
+            <soap12:operation soapAction="urn:getComponentConfigs" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getData">
+            <soap12:operation soapAction="urn:getData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependents">
+            <soap12:operation soapAction="urn:getComponentDependents" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="drillThrough">
+            <soap12:operation soapAction="urn:drillThrough" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionLog">
+            <soap12:operation soapAction="urn:getExecutionLog" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentTypes">
+            <soap12:operation soapAction="urn:getComponentTypes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testComponent">
+            <soap12:operation soapAction="urn:testComponent" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addComponents">
+            <soap12:operation soapAction="urn:addComponents" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="runExecution">
+            <soap12:operation soapAction="urn:runExecution" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="migrateComponents">
+            <soap12:operation soapAction="urn:migrateComponents" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeComponents">
+            <soap12:operation soapAction="urn:removeComponents" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeExecutions">
+            <soap12:operation soapAction="urn:removeExecutions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentOutputs">
+            <soap12:operation soapAction="urn:getComponentOutputs" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionHistory">
+            <soap12:operation soapAction="urn:getExecutionHistory" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="fetchData">
+            <soap12:operation soapAction="urn:fetchData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalColumns">
+            <soap12:operation soapAction="urn:getRelationalColumns" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getNames">
+            <soap12:operation soapAction="urn:getNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubeDimensions">
+            <soap12:operation soapAction="urn:getOlapCubeDimensions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="prepareData">
+            <soap12:operation soapAction="urn:prepareData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionStatus">
+            <soap12:operation soapAction="urn:getExecutionStatus" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getScopes">
+            <soap12:operation soapAction="urn:getScopes" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addExecution">
+            <soap12:operation soapAction="urn:addExecution" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="stopExecution">
+            <soap12:operation soapAction="urn:stopExecution" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDimensions">
+            <soap12:operation soapAction="urn:getOlapDimensions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="uploadFile">
+            <soap12:operation soapAction="urn:uploadFile" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDatabases">
+            <soap12:operation soapAction="urn:getOlapDatabases" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ETL-ServerHttpBinding" type="ns:ETL-ServerPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getLocators">
+            <http:operation location="ETL-Server/getLocators"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getLocators"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getLocators"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatus">
+            <http:operation location="ETL-Server/getServerStatus"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getServerStatus"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getServerStatus"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependencies">
+            <http:operation location="ETL-Server/getComponentDependencies"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getComponentDependencies"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getComponentDependencies"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubes">
+            <http:operation location="ETL-Server/getOlapCubes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getOlapCubes"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getOlapCubes"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalTables">
+            <http:operation location="ETL-Server/getRelationalTables"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getRelationalTables"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getRelationalTables"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="validateComponents">
+            <http:operation location="ETL-Server/validateComponents"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="validateComponents"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="validateComponents"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalSchemas">
+            <http:operation location="ETL-Server/getRelationalSchemas"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getRelationalSchemas"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getRelationalSchemas"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="save">
+            <http:operation location="ETL-Server/save"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="save"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="save"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalCatalogs">
+            <http:operation location="ETL-Server/getRelationalCatalogs"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getRelationalCatalogs"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getRelationalCatalogs"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentConfigs">
+            <http:operation location="ETL-Server/getComponentConfigs"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getComponentConfigs"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getComponentConfigs"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getData">
+            <http:operation location="ETL-Server/getData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getData"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getData"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentDependents">
+            <http:operation location="ETL-Server/getComponentDependents"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getComponentDependents"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getComponentDependents"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="drillThrough">
+            <http:operation location="ETL-Server/drillThrough"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="drillThrough"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="drillThrough"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionLog">
+            <http:operation location="ETL-Server/getExecutionLog"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getExecutionLog"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getExecutionLog"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentTypes">
+            <http:operation location="ETL-Server/getComponentTypes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getComponentTypes"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getComponentTypes"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testComponent">
+            <http:operation location="ETL-Server/testComponent"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="testComponent"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="testComponent"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addComponents">
+            <http:operation location="ETL-Server/addComponents"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="addComponents"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="addComponents"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="runExecution">
+            <http:operation location="ETL-Server/runExecution"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="runExecution"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="runExecution"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="migrateComponents">
+            <http:operation location="ETL-Server/migrateComponents"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="migrateComponents"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="migrateComponents"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeComponents">
+            <http:operation location="ETL-Server/removeComponents"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="removeComponents"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="removeComponents"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="removeExecutions">
+            <http:operation location="ETL-Server/removeExecutions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="removeExecutions"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="removeExecutions"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getComponentOutputs">
+            <http:operation location="ETL-Server/getComponentOutputs"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getComponentOutputs"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getComponentOutputs"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionHistory">
+            <http:operation location="ETL-Server/getExecutionHistory"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getExecutionHistory"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getExecutionHistory"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="fetchData">
+            <http:operation location="ETL-Server/fetchData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="fetchData"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="fetchData"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRelationalColumns">
+            <http:operation location="ETL-Server/getRelationalColumns"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getRelationalColumns"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getRelationalColumns"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getNames">
+            <http:operation location="ETL-Server/getNames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getNames"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getNames"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapCubeDimensions">
+            <http:operation location="ETL-Server/getOlapCubeDimensions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getOlapCubeDimensions"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getOlapCubeDimensions"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="prepareData">
+            <http:operation location="ETL-Server/prepareData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="prepareData"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="prepareData"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getExecutionStatus">
+            <http:operation location="ETL-Server/getExecutionStatus"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getExecutionStatus"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getExecutionStatus"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getScopes">
+            <http:operation location="ETL-Server/getScopes"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getScopes"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getScopes"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addExecution">
+            <http:operation location="ETL-Server/addExecution"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="addExecution"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="addExecution"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="stopExecution">
+            <http:operation location="ETL-Server/stopExecution"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="stopExecution"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="stopExecution"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDimensions">
+            <http:operation location="ETL-Server/getOlapDimensions"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getOlapDimensions"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getOlapDimensions"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="uploadFile">
+            <http:operation location="ETL-Server/uploadFile"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="uploadFile"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="uploadFile"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getOlapDatabases">
+            <http:operation location="ETL-Server/getOlapDatabases"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getOlapDatabases"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getOlapDatabases"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="ETL-Server">
+        <wsdl:port name="ETL-ServerHttpSoap11Endpoint" binding="ns:ETL-ServerSoap11Binding">
+            <soap:address location="http://91.198.71.244:7776/etlserver/services/ETL-Server.ETL-ServerHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="ETL-ServerHttpSoap12Endpoint" binding="ns:ETL-ServerSoap12Binding">
+            <soap12:address location="http://91.198.71.244:7776/etlserver/services/ETL-Server.ETL-ServerHttpSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="ETL-ServerHttpEndpoint" binding="ns:ETL-ServerHttpBinding">
+            <http:address location="http://91.198.71.244:7776/etlserver/services/ETL-Server.ETL-ServerHttpEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

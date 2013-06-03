@@ -1,6 +1,6 @@
 module.exports = {
     db:{
-        host: 'irvin-dd.no-ip.org',
+        host: 'localhost',
         port: 6379
     }
 };

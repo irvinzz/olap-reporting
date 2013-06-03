@@ -11,6 +11,11 @@
     "stylus": "*",
     "node-class": "*",
 	"MD5": "*",
-	"redis": "*"
+	"redis": "*",
+    "passport": "*",
+    "passport-local": "*",
+    "nconf": "*",
+    "express-controller": "*",
+    "socket.io": "*"
   }
 }

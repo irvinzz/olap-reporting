@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <script src='http://code.jquery.com/jquery-1.9.1.min.js'>
+        </script>
+        <script>
+            function _ar(){
+                var s = 'Ханты-Мансийский Автономный округ - Югра АО, Сургутский р-н, Федоровский пгт, имени Федорова Сергея Филипповича ул, 2';
+                $.ajax({
+                    url: 'http://geocode-maps.yandex.ru/1.x/?format=json&geocode='+encodeURIComponent(s),
+                    dataType: 'json', // Notice! JSONP <-- P (lowercase)
+                    success:function(json){
+                    // do stuff with json (in this case an array)
+                        console.log(json);
+                        $('<div>'+JSON.stringify(json)+'</div>').appendTo($('body'));
+                    },
+                    error:function(){
+                        alert("Error");
+                    },
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <input type='button' value="clickme" onclick="_ar();">
+    </body>
+</html>

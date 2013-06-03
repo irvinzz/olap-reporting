@@ -1,0 +1,12 @@
+--2013-02-07 13:01:14--  http://olap.rts-ugra.ru:7776/etlserver/services/ETL-Server?wsdl
+Resolving olap.rts-ugra.ru (olap.rts-ugra.ru)... 91.198.71.244
+Connecting to olap.rts-ugra.ru (olap.rts-ugra.ru)|91.198.71.244|:7776... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/xml]
+Saving to: ‘ETL-Server?wsdl’
+
+     0K .......... .......... .......... .......... .......... 2.59M
+    50K .......... .......... .......... .......... .          4.21M=0.03s
+
+2013-02-07 13:01:14 (3.13 MB/s) - ‘ETL-Server?wsdl’ saved [93373]
+

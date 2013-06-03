@@ -1,0 +1,33 @@
+{
+    "name": "Vasiliy Pupkin",
+    "body": {
+        "head": {},
+        "neck": {},
+        "body": {},
+        "arms": [
+            {
+                "type": "left",
+                "fingers":[
+                    {
+                        "length":4.94
+                    }
+                ]
+            },
+            {
+                "type": "right",
+                "finger": [
+                    {
+                        "length":4.25
+                    },
+                    {
+                        "length":5.12
+                    },
+                    {
+                        "length":5.22
+                    }
+                ]
+            }
+        ]
+    },
+    "something":"else"
+}
