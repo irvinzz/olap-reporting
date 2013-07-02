@@ -1,6 +1,6 @@
 var Ext = Ext || {};
 
-Ext.define('Olap.view.User.Edit',{
+Ext.define('Olap.view.user.Edit',{
     extend: 'Ext.form.Panel',
     title: 'Создание пользователя',
     method: 'POST',
@@ -29,7 +29,7 @@ Ext.define('Olap.view.User.Edit',{
                 name: 'phone',
                 allowBlank: true,
                 value: D.phone || ''
-            },
+            }/*,
             {
                 xtype: 'filefield',
                 name: 'photo',
@@ -39,7 +39,7 @@ Ext.define('Olap.view.User.Edit',{
                 allowBlank: false,
                 anchor: '100%',
                 buttonText: 'Select Photo...'
-            }
+            }*/
         ];
         //this.url = this.Data.id || '/user';
         if (this.Data!==undefined){
@@ -67,7 +67,8 @@ Ext.define('Olap.view.User.Edit',{
                 var formPanel = this.up('form');
                 if (form.isValid()) {
                     console.log(form.getValues());
-                    /*form.submit({
+                    form.submit({
+                        url: '/api/user',
                         success: function(form, action) {
                             Ext.Msg.alert('Success', action.result.msg,function(){
                                 window.OlapNavigator.fireEvent('Olap.view.User.List.Update');
@@ -78,7 +79,7 @@ Ext.define('Olap.view.User.Edit',{
                         failure: function(form, action) {
                             Ext.Msg.alert('Failed', action.result.msg);
                         }
-                    });*/
+                    });
                 }
             }
         }

@@ -122,7 +122,8 @@
                     });
                 }else{
                     callback(500,{
-                        success:false
+                        success:false,
+                        result: result
                     });
                 }
             });

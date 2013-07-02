@@ -1,6 +1,20 @@
 extends layout
-block scripts
-    script(type='text/javascript', src='/js/app.js')
 block content
   h1= title
   p Welcome to #{title}
+  p
+    h1 Please Enable JavaScript in you Browser
+block headerscripts
+    script(type='text/javascript')
+        (function(){
+            var body = document.getElementsByTagName('body');
+            body = body[0];
+            console.log(body);
+            var childs = body.children;
+            for (var i=0,l=childs.length; i<l; i++){
+                body.removeChild(childs[i]);
+            }
+        })();
+block scripts
+    script(type='text/javascript', src='/js/libs/md5.js')
+    script(type='text/javascript', src='/js/app.js')

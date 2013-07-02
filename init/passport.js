@@ -1,32 +1,39 @@
 function passport_init(){
     var passport = require('passport');
-    var paloClient = require('../controllers/libs.js').getGlobalClient();
+    var paloClient;
+    require('../controllers/libs.js').getGlobalClient({},function(err,result){
+        if (!err){
+            paloClient = result;
+        }else{
+            throw err+' with '+JSON.stringify(result);
+        }
+    });
     passport.serializeUser(function(user,done){
         done(null,user);
     });
     passport.deserializeUser(function(id,done){
-        done(null,{});
+        done(null,id);
     });
     var LocalStrategy = require('passport-local').Strategy;
     passport.use(new LocalStrategy({ usernameField: 'user', passwordField: 'password'},function(username,password,done){
-/*        console.log('user: '+username);
-        console.log('pwd:  '+password);
         paloClient.call('server','login',{
-            query:{
-                user: username,
-                extern_password: password
-            }},function(err,result){
+                query:{
+                    user: username,
+                    password: password
+                }
+            },function(err,result){
                 if (!err){
-                    done(null,result);
+                    var user = {
+                        user: username,
+                        sid: result.rows[0].sid,
+                        ttl: result.rows[0].ttl
+                    };
+                    done(null,user);
                 }else{
-                    done(err,null);
+                    done(err,result);
                 }
             }
-        );*/
-        return done(null,{
-            user: 'aaxas',
-            someinfo: 'asdas'
-        });
+        );
     }));
     return passport;
 }

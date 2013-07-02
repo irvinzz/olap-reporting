@@ -12,24 +12,19 @@ Ext.define('Olap.view.templates.Toolbar',{
 });
 
 Ext.define('Olap.view.templates.Edit',{
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.container.Container',
     title: 'Редактор шаблонов',
-    layout: 'fit',
+    layout: 'vbox',
     icon: '/img/icons/script_edit.png',
+    defaults: {
+        width: '100%'
+    },
     items: [
+        Ext.create('Olap.view.templates.Toolbar',{
+        }),
         {
-            xtype: 'panel',
-            layout: 'border',
-            items: [
-                Ext.create('Olap.view.templates.Toolbar',{
-                    region: 'north'
-                }),
-                {
-                    xtype: 'htmleditor',
-                    region: 'center',
-                    flex: 2
-                }
-            ]
+            xtype: 'htmleditor',
+            flex: 2
         }
     ]
 });

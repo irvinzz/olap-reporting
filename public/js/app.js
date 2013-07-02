@@ -1,49 +1,38 @@
 var Ext = Ext || {};
-
-Ext.application({
-    name: 'HelloExt',
-    //controllers: ['Olap.controller.MainWindow'],
-    launch: function() {
-        Ext.create('Ext.container.Viewport', {
-            layout: 'fit',
-            items: 
-                {
-                    xtype: 'form',
-                    defaults: {
-                        xtype: 'textfield'
-                    },
-                    items: [
-                        {
-                            fieldLabel: 'username',
-                            name: 'user'
-                        },
-                        {
-                            fieldLabel: 'extern_password',
-                            name: 'password'
-                        }
-                    ],
-                    buttons: [
-                        {
-                            text: 'Submit',
-                            handler: function(){
-                                var form = this.up('form');
-                                if (form.isValid()){
-                                    form.submit({
-                                        url: '/ctrl/auth/local',
-                                        success: function(form, action){
-                                            console.log(action);
-                                            console.log('success');
-                                        },
-                                        failure: function(form, action){
-                                            console.log(action);
-                                            console.log('failure');
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    ]
-                }
-        });
+var md5 = md5 || function() { Ext.Msg.alert('no md5 presented'); };
+Ext.Loader.setConfig({
+    enabled: true,
+    disableCaching: true,
+    paths: {
+        'Olap': '/js'
     }
 });
+
+Ext.define('Olap.view.Viewport',{
+    extend: 'Ext.container.Viewport',
+    itemId: 'viewport',
+    layout: 'fit',
+});
+
+Ext.application({
+    name: 'olapapp',
+    controllers: ['Olap.controller.Admin','Olap.controller.Navigator','Olap.controller.Hash','Olap.controller.Socket_io','Olap.controller.History'],
+    launch: function() {
+        var vp = Ext.create('Olap.view.Viewport');
+        window.viewport = vp;
+        //Ext.History.fireEvent('change');
+        Ext.History.add('/');
+        
+        /*Ext.create('Olap.view.Login', {
+            renderTo: Ext.getBody(),
+            closable: false
+        }).show();*/
+    }
+});
+
+
+
+
+
+
+

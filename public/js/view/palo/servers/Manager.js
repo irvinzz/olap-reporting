@@ -1,9 +1,13 @@
 var Ext = Ext || {};
 
 Ext.define('Olap.view.palo.servers.Manager',{
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.container.Container',
     title: 'Панель управления Palo Серверами',
     singleInstance: true,
+    layout: 'vbox',
+    defaults:{
+        width: '100%'
+    },
     items:[
         Ext.create('Olap.view.palo.servers.Toolbar',{
             listeners:{
@@ -16,6 +20,10 @@ Ext.define('Olap.view.palo.servers.Manager',{
                 }
             }
         }),
-        Ext.create('Olap.view.palo.servers.List',{flex: 2})
+        Ext.create('Olap.view.palo.servers.List',{flex: 2})//,
+        /*{
+            html: 'sometext',
+            xtype: 'container'
+        }*/
     ],
 });

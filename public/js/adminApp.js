@@ -8,6 +8,13 @@ Ext.Loader.setConfig({
     }
 });
 
+Ext.require([
+    'Olap.view.MainFrame',
+    'Olap.view.Navigator',
+    'Olap.view.admin.Toolbar',
+    'Olap.view.admin.MainWindow',
+]);
+
 Ext.application({
     name: 'Olap.app.Admin',
     controllers: ['Olap.controller.Admin','Olap.controller.Navigator','Olap.controller.Hash','Olap.controller.Socket_io'],

@@ -4,7 +4,9 @@ html
     title= title
     //ext.js
     link(rel='stylesheet', href='/js/ext/resources/css/ext-all.css')
-    script(type='text/javascript', src='/js/ext/ext-all-debug.js')
+    script(type='text/javascript', src='/js/ext/ext-all-dev.js')
+
+    script(type='text/javascript', src='/js/libs/Hasher/hasher.js')
     
     //app
     link(rel='stylesheet', href='/stylesheets/style.css')
@@ -13,6 +15,9 @@ html
     script(src="/socket.io/socket.io.js")
     script(src="/js/controller/Socket.io.js")
         
-    block scripts
+    //block scripts
   body
     block content
+    //block headerscripts
+    //block footerscripts
+    block scripts

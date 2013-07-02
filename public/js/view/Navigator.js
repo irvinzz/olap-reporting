@@ -1,5 +1,9 @@
 var Ext = Ext || {};
 
+Ext.require([
+    'Olap.view.user.Manager'
+]);
+
 Ext.define('Olap.store.Navigator',{
     extend: 'Ext.data.TreeStore',
     root: {
@@ -58,6 +62,12 @@ Ext.define('Olap.store.Navigator',{
                 text: 'RedisCommander',
                 entryId: 'Olap.view.RedisCommander',
                 icon: '/img/rediscommander.png',
+                leaf: true
+            },
+            {
+                text: 'Источники данных',
+                icon: '/img/icons/book_previous.png',
+                entryId: 'Olap.view.sources.Manager',
                 leaf: true
             },
             {

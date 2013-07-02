@@ -1,42 +1,19 @@
 var Ext = Ext || {};
 
-Ext.define('Olap.model.Users', {
-    extend: 'Ext.data.Model',
-    fields: [
-        {name: 'id',    type: 'int'   },
-        {name: 'name',  type: 'string'},
-        {name: 'email', type: 'string'},
-        {name: 'phone', type: 'string'},
-        {name: 'deleted', type: 'boolean'}
-    ]
-});
-
-Ext.define('Olap.store.Users', {
-    extend: 'Ext.data.Store',
-    model: 'Olap.model.Users',
-    proxy: {
-        type: 'rest',
-        url: '/user',
-        reader: {
-            type: 'json'
-        },
-        extraParams:{
-            includeDeleted: true
-        }
-    },
-    autoLoad: true,
-    autoSync: true
-});
+var ___store = Ext.create('Olap.store.User');
 
 Ext.define('Olap.view.user.List',{
     extend: 'Ext.grid.Panel',
     title: 'Список пользователей',
     xtype: 'OlapViewUserList',
     //store: Ext.data.StoreManager.lookup('simpsonsStore'),
-    store: Ext.create('Olap.store.Users'),
-    selType: 'cellmodel',
+    store: ___store,
+    selType: 'rowmodel',
+    //height: '100%',
+    //flex: 2,
+    
     plugins: [
-        Ext.create('Ext.grid.plugin.CellEditing', {
+        Ext.create('Ext.grid.plugin.RowEditing', {
             clicksToEdit: 2,
             listeners: {
                 beforeedit: function( editor, e, eOpts ){
@@ -100,7 +77,13 @@ Ext.define('Olap.view.user.List',{
     ],
     initComponent: function(){
         this.callParent();
-    }
+    },
+    dockedItems: [{
+        xtype: 'pagingtoolbar',
+        dock: 'bottom',
+        displayInfo: true,
+        store: ___store
+    }]
 });
 
 

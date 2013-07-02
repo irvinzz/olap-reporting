@@ -18,9 +18,10 @@ Ext.define('Olap.store.Palo.Servers', {
     model: 'Olap.model.Palo.Servers',
     proxy: {
         type: 'rest',
-        url: '/palo/servers',
+        url: '/api/palo.servers',
         reader: {
-            type: 'json'
+            type: 'json',
+            root: 'rows'
         }
     },
     autoLoad: true,
@@ -28,15 +29,9 @@ Ext.define('Olap.store.Palo.Servers', {
 });
 
 Ext.define('Olap.view.palo.servers.List',{
-    extend: 'Ext.grid.Panel',
+    extend: 'Olap.view.common.List',
     title: 'Список Серверов Palo',
     store: Ext.create('Olap.store.Palo.Servers'),
-    selType: 'cellmodel',
-    plugins: [
-        Ext.create('Ext.grid.plugin.CellEditing', {
-            clicksToEdit: 2
-        })
-    ],
     columns: [
         { text: 'Номер', dataIndex: 'id', flex: 0 },
         { text: 'Имя',  dataIndex: 'name', flex: 1, editor: 'textfield' },
@@ -53,8 +48,8 @@ Ext.define('Olap.view.palo.servers.List',{
             },
             renderer: function(value){
                 var r = '';
-                for (var i=0;i<value.length;++i){
-                    r+='*';
+                for (var i=0, l=value.length; i<l; ++i){
+                    r+='●';
                 }
                 return r;
             }
@@ -84,7 +79,7 @@ Ext.define('Olap.view.palo.servers.List',{
             text: 'info',
             handler: function(item, e, eOpts){
                 Ext.Ajax.request({
-                    url: '/api/server/info',
+                    url: '/palo/server/info',
                     success: function(response){
                         console.log(response);
                     }

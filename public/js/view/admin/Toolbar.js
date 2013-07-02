@@ -15,6 +15,14 @@ Ext.define('Olap.view.admin.Toolbar',{
                 },
                 '-',
                 {
+                    text: 'Logout',
+                    listeners: {
+                        click: function(){
+                            Ext.History.add('/logout');
+                        }
+                    }
+                },
+                {
                     text: 'Выход',
                     listeners: {
                         click: function(){

@@ -5,6 +5,7 @@
     module.exports = function() {
         if (!dbclient){
             dbclient = redis.createClient(config.db.port, config.db.host);
+            dbclient.select(2);
             dbclient.on("connect",function(){
                 console.log("RedisClient connected;");
             });

@@ -7,7 +7,7 @@ Ext.define('Olap.view.palo.servers.Toolbar',{
             xtype:'button',
             text: 'Добавить',
             handler: function(){
-                Ext.ComponentManager.get('Navigator').fireEvent('Olap.view.Navigator.Navigate',['Olap.view.Palo.Servers.Edit']);
+                Ext.ComponentManager.get('Navigator').fireEvent('Olap.view.Navigator.Navigate',['Olap.view.palo.servers.Edit']);
             }
         },
         {

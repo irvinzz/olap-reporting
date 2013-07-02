@@ -1,6 +1,7 @@
 (function() {
     var http = require("http");
     var Class = require('node-class').Class;
+    var nconf = require('../init/nconf')();
 
     var entrySet = {
         server: {
@@ -14,11 +15,18 @@
                 k: ['OK']
             },
             login: { //	Login to server by user name and password.
-                k: ['sid', 'ttl'],
-                fn: function(req, result) { //	After login action
-                    req.session.sid = result.result[0].sid;
-                    //req.session.
-                }
+                k: ['sid', 'ttl']/*,
+                fn: function(session, result) { //	After login action
+                    session.sid = result.rows[0].sid;
+                    var ttl = + result.rows[0].ttl;
+                    if (ttl!==undefined){
+                        setTimeout(function() {
+                            paloList[session.paloKey] = undefined;
+                            session.sid = undefined;
+                            session.ttl = undefined;
+                        }, ttl);
+                    }
+                }*/
             },
             logout: { //        Logout the current user
                 k: ['OK'],
@@ -36,6 +44,15 @@
         },
         database: {
             cubes: { //	Shows the list of cubes
+                a: {
+                    database: 0,
+                    show_normal: 1,
+                    show_system: 0,
+                    show_attribute: 0,
+                    show_info: 0,
+                    show_gputype: 0,
+                    sid: ''
+                },
                 k: ['cube', 'name_cube', 'number_dimensions', 'dimensions', 'number_cells', 'number_filled_cells', 'status', 'type', 'cube_token']
             },
             create: { //	Creates new database.
@@ -300,7 +317,7 @@
                 k: ['OK']
             }
         },
-        cubes: {
+        cube: {
             clear: {
                 k: ['cube', // 	identifier 	Identifier of the cube
                 'name_cube', // 	string 	Name of the cube
@@ -405,6 +422,14 @@
         },
         cell: {
             area: {
+                a: {
+                    database: 0,
+                    cube: 0,
+                    area: 0,         //  Comma separated list of element identifiers list. Each element identifiers list is colon separated. The area is the cartesian product.
+                    show_rule: 0,     //  boolean     
+                    show_lock_info: 0,
+                    sid: 0
+                },
                 k: ['type', // 	integer 	Type of the value (1=NUMERIC, 2=STRING)
                 'exists', // 	boolean 	1 if at least base cell for the path exists
                 'value', // 	double/string 	Value of the cell
@@ -524,11 +549,14 @@
     });
 
     paloClass.implements({
-        call: function(e, r, req, c) {
-            this.hg('/' + e + '/' + r, req.query, entrySet[e][r].k, function(err, result) {
+        call: function(e, r, opts, c) {
+            console.log(e,r);
+            this.hg('/' + e + '/' + r, opts.query, entrySet[e][r].k, function(err, result) {
                 if (!err) {
                     var aR = entrySet[e][r].fn;
-                    if (typeof(aR) === typeof(function() {})) aR(req, result);
+                    if (!!aR && !!opts.session &&!!opts.session){
+                        aR(opts.session, result);
+                    }
                 }
                 c(err, result);
             });
@@ -550,10 +578,10 @@
                 port: this.port,
                 path: fullpath
             }, onResponse);
-
+            
+            console.log(this.host,this.port,fullpath);
+            
             httpRequest.on('error', function(error) {
-                console.log('bingo');
-                console.log(error);
                 callback(500, error);
             });
             httpRequest.end();
@@ -565,34 +593,47 @@
                 res.on('end', onEnd);
 
                 function onEnd() {
-                    var headers = {
-                        "X-PALO-SV": res.headers["x-palo-sv"] || '',
-                        "X-PALO-DB": res.headers["x-palo-db"] || '',
-                        "X-PALO-DIM": res.headers["x-palo-dim"] || '',
-                        "X-PALO-CB": res.headers["x-palo-cb"] || '',
-                        "X-PALO-CC": res.headers["x-palo-cc"] || ''
-                    };
                     if (res.statusCode === 200) {
+                        var headers = {
+                            "X-PALO-SV": res.headers["x-palo-sv"] || undefined,
+                            "X-PALO-DB": res.headers["x-palo-db"] || undefined,
+                            "X-PALO-DIM": res.headers["x-palo-dim"] || undefined,
+                            "X-PALO-CB": res.headers["x-palo-cb"] || undefined,
+                            "X-PALO-CC": res.headers["x-palo-cc"] || undefined
+                        };
                         var result = [];
                         var rs = r.split('\n');
                         for (var i = 0; i < rs.length; i++) {
                             if (rs[i] !== '') {
                                 var r1 = rs[i].split(';');
                                 var r2 = {};
-                                for (var j = 0; j < results.length; j++) {
+                                for (var j = 0, l = results.length; j < l; j++) {
+                                    var f = r1[j];
+                                    if (typeof f === 'string'){
+                                        var len = f.length;
+                                        if (f[0]==='"' && f[len-1]){
+                                            //console.log(r1[j]);
+                                            r1[j] = f.substring(1,f.length-1);
+                                            //console.log(r1[j]);
+                                        }
+                                    }
+                                    
+                                    
                                     r2[results[j]] = r1[j];
                                 }
                                 result.push(r2);
                             }
                         }
                         callback(null, {
+                            success: true,
                             headers: headers,
-                            result: result
+                            total: result.length,
+                            rows: result,
+                            //result: result
                         });
                     }
                     else {
-                        var r1e = r.split(';');
-                        callback(res.statusCode, r1e);
+                        callback(res.statusCode, r);
                     }
                 }
             }
@@ -610,33 +651,112 @@
         return key;
     }
     
-    module.exports.getGlobalClient = function(opts){
+    module.exports.getGlobalClient = function(opts, cb) {
+        console.log(opts);
         var opts = opts || {};
-        if (localInstance===undefined){
+        if (localInstance === undefined) {
             localInstance = new paloClass({
-                host: opts.host || 'olap.rts-ugra.ru',
-                port: opts.port || 7921
+                host: opts.host || nconf.get('palo:host'),
+                port: opts.port || nconf.get('palo:port')
             });
+            localInstance.call('server', 'login', {
+                query: {
+                    user: nconf.get('palo:user'),
+                    password: nconf.get('palo:password')
+                }
+            }, function(err, result) {
+                if (!err) {
+                    console.log(result);
+                    localInstance.sid = result.rows[0].sid;
+                    localInstance.ttl = result.rows[0].ttl;
+                    cb(null, localInstance);
+                    var ttl = 1000*(+result.rows[0].ttl);        //  seconds to milliseconds
+                    setTimeout(function() {                         // autodelete after ttl
+                        localInstance = undefined;
+                        console.log('deleted after '+ttl);
+                        //delete localInstance;
+                    }, ttl);
+                }
+                else {
+                    cb(err, result);
+                }
+            })
         }
-        return localInstance;
+        else {
+            localInstance.call('server','databases',{},function(err,result){
+                console.log(err);                                               //  do something
+            })
+            cb(null, localInstance);
+        }
+    }
+    
+    module.exports.purgeClient = function(id){
+        delete paloList[id];
     }
 
-    module.exports.getClient = function(session, callback) {
-        var id = session.paloKey;
-
+    var getClient = function(params, callback) {
+        var id = params.paloKey;
+        var sid = params.sid
+        if (sid===undefined) throw 'sid is undefined at `'+__filename+'`';
+        var ttl = params.ttl || 3600;
         if ((id === undefined) || (paloList[id] === undefined)) {
             var newKey = getRandKey();
             var newBase = new paloClass({
-                host: 'olap.rts-ugra.ru',
+                host: '91.198.71.244',
                 port: 7921
             });
-            session.paloKey = newKey;
+            newBase.sid = sid;
+            newBase.ttl = ttl;
+            
             paloList[newKey] = newBase;
+            callback(null, newBase);
+            setTimeout(function() {
+                delete paloList[id];
+            }, ttl);
+            return newKey;
+        }else{
+            callback(null,paloList[id]);
+            return id;
         }
-
-        var palov = paloList[session.paloKey];
-        palov.sid = session.sid;
-        callback(null, palov);
+    }
+    module.exports.getClient = getClient;
+    module.exports.getClientWrap = function(req,res,next){
+        var sid;
+        var ttl = 3600;
+        try {
+            sid = req.session.passport.user.sid;
+            ttl = req.session.passport.user.ttl || ttl;
+            if (!req.isAuthenticated()){
+                throw '401';
+            }
+        }catch(e){
+            console.log(e);
+            if (!req.xhr){
+                return res.render('redirect',{
+                    to: '/'
+                });
+                res.send(e);
+                return;
+            }else{
+                return res.json(401,{
+                    success: false,
+                    err: '`sid` not found, probably u r not logged in ?'
+                });
+            }
+        }
+        req.session.paloKey = getClient({
+            paloKey: req.session.paloKey,
+            sid: sid,
+            ttl: ttl
+    	},function(err,client){
+            if (!err){
+                req.paloClient = client;
+                
+                next();
+            }else{
+                res.send('error');
+            }
+        });
     }
 /*module.exports.getInstance = function(options){
         if (pc===undefined){
@@ -647,3 +767,106 @@
 })();
 var localInstance;
 var paloList = {};
+
+module.exports.errorHandler = {
+    1:	'unknown',
+	2:	'internal error',
+	1000:	'identifier not found',
+	1001:	'invalid filename',
+	1002:	'cannot create directory',
+	1003:	'cannot rename file',
+	1004:	'authorization failed',
+	1005:	'invalid type',
+	1006:	'invalid coordinates',
+	1007:	'conversion failed',
+	1008:	'file not found',
+	1009:	'not authorized for operation',
+	1010:	'corrupt file',
+	1011:	'already within event',
+	1012:	'not within event',
+	1013:	'invalid permission entry',
+	1014:	'invalid server path',
+	1015:	'invalid session',
+	1016:	'missing parameter',
+	1017:	'server token outdated',
+	1018:	'invalid splash mode',
+	1019:	'worker authorization failed',
+	1020:	'worker error',
+	1021:	'api call not implemented',
+	1022:	'insecure communication disabled',
+	1023:	'not enough memory',
+	1024:	'ssl failed',
+	1025:	'gpu server not enabled',
+	1026:	'invalid string',
+	2000:	'invalid database name',
+	2001:	'database not found',
+	2002:	'database not loaded',
+	2003:	'database not saved',
+	2004:	'database still loaded',
+	2005:	'database name in use',
+	2006:	'databae is not deletable',
+	2007:	'database in not renamable',
+	2008:	'database token outdated',
+	2009:	'invalid database type',
+	3000:	'dimension empty',
+	3001:	'dimension already exists',
+	3002:	'dimension not found',
+	3003:	'invalid dimension name',
+	3004:	'dimension is not changable',
+	3005:	'dimension name in use',
+	3006:	'dimension in use',
+	3007:   'dimension not deletable',
+	3008:   'dimension not renamable',
+	3009:	'dimension token outdated',
+	3010:	'dimension is locked',
+	4000:	'element already exists',
+	4001:	'cirular reference',
+	4002:	'element name in use',
+	4003:	'element name not unique',
+	4004:	'element not foundv',
+	4005:	'element is no child',
+	4006:	'invalid element name',
+	4007:	'invalid element offset',
+	4008:	'invalid element type',
+	4009:	'invalid element position',
+	4010:	'element not deletable',
+	4011:	'element not renamable',
+	4012:	'element not changable',
+	4013:	'invalid mode',
+	5000:	'cube not found',
+	5001:	'invalid cube name',
+	5002:	'cube not loaded',
+	5003:	'cube empty',
+	5004:	'cube not saved',
+	5005:	'splash disabled',
+	5006:	'copy path must be numeric',
+	5007:	'invalid copy value',
+	5008:	'cube name in use',
+	5009:	'cube is not deletable',
+	5010:	'cube is not renamable',
+	5011:	'cube token outdated',
+	5012:	'splashing is not possible',
+	5013:	'cube lock not found',
+	5014:	'wrong user for locked area',
+	5015:	'could not create lock',
+	5016:	'is blocked because of a locked area',
+	5017:	'not enough rollback capacity',
+	5018:	'goalseek error',
+	5019:	'cube is system cube',
+	6000:	'legacy error',
+	6001:	'legacy error',
+	6002:	'legacy error',
+	6003:	'legacy error',
+	6004:	'legacy error',
+	6005:	'legacy error',
+	6006:	'legacy error',
+	6007:	'legacy error',
+	6008:	'legacy error',
+	6009:	'legacy error',
+	6010:	'legacy error',
+	7000:	'illegal worker response',
+	8001:	'parse error in rule',
+	8002:	'rule not found',
+	8003:	'rule has circular reference',
+	8004:	'division by zero'
+};

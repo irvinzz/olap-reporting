@@ -8,7 +8,7 @@ Ext.define('Olap.view.user.Toolbar',{
             text: 'Добавить',
             icon: '/img/icons/user_add.png',
             handler: function(){
-                Ext.ComponentManager.get('Navigator').fireEvent('Olap.view.Navigator.Navigate',['Olap.view.User.Edit']);
+                Ext.ComponentManager.get('Navigator').fireEvent('Olap.view.Navigator.Navigate',['Olap.view.user.Edit']);
             }
         },
         {

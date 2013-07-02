@@ -43,6 +43,7 @@ Ext.define('Olap.view.palo.servers.Edit',{
                 var formPanel = this.up('form');
                 if (form.isValid()) {
                     form.submit({
+                        url: '/api/palo.servers',
                         success: function(form, action) {
                             Ext.Msg.alert('Success', action.result.msg,function(){
                                 window.OlapNavigator.fireEvent('Olap.view.Olap.Servers.List.Update');

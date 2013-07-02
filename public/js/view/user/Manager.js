@@ -1,22 +1,30 @@
 var Ext = Ext || {};
 
+Ext.require([
+    'Olap.view.user.Toolbar',
+    'Olap.view.user.List',
+    'Olap.view.user.Edit'
+]);
+
 Ext.define('Olap.view.user.Manager',{
-    extend: 'Ext.panel.Panel',
+    extend: 'Olap.view.common.Manager',
     title: 'Панель управления пользователями',
     icon: '/img/icons/users.png',
+    
     singleInstance: true,
-    items:[
+    initComponent: function(){
+        this.callParent();
+    },
+    items: [
         Ext.create('Olap.view.user.Toolbar',{
             listeners:{
-                'Call': function(options){
-                    
-                },
                 'Olap.view.User.List.Update': function(){
                     this.up().child('OlapViewUserList').store.load();
-                    //this.up().up().userList.store.load();
                 }
             }
         }),
-        Ext.create('Olap.view.user.List',{flex: 2})
-    ],
+        Ext.create('Olap.view.user.List',{
+            flex: 2
+        })
+    ]
 });
