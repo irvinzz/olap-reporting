@@ -1,38 +1,23 @@
 var Ext = Ext || {};
+
 var md5 = md5 || function() { Ext.Msg.alert('no md5 presented'); };
+
 Ext.Loader.setConfig({
     enabled: true,
-    disableCaching: true,
+    disableCaching: false,
     paths: {
-        'Olap': '/js'
+        'Olap': '/js',
+        'Ext.ux': '/js/ext/ux'
     }
 });
 
-Ext.define('Olap.view.Viewport',{
-    extend: 'Ext.container.Viewport',
-    itemId: 'viewport',
-    layout: 'fit',
-});
+Ext.Ajax.disableCaching = false;
 
 Ext.application({
     name: 'olapapp',
     controllers: ['Olap.controller.Admin','Olap.controller.Navigator','Olap.controller.Hash','Olap.controller.Socket_io','Olap.controller.History'],
     launch: function() {
-        var vp = Ext.create('Olap.view.Viewport');
-        window.viewport = vp;
-        //Ext.History.fireEvent('change');
+        window.viewport = Ext.create('Olap.view.Viewport');
         Ext.History.add('/');
-        
-        /*Ext.create('Olap.view.Login', {
-            renderTo: Ext.getBody(),
-            closable: false
-        }).show();*/
     }
 });
-
-
-
-
-
-
-

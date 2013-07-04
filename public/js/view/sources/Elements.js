@@ -21,7 +21,8 @@ Ext.define('Olap.view.sources.Elements', {
             names = [];
                    
         Ext.Array.each(records, function(rec){
-            names.push(rec.get('text'));
+            console.log(rec);
+            names.push(rec.raw.element || rec.get('name'));
         });
                     
         Ext.MessageBox.show({

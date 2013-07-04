@@ -709,14 +709,26 @@
             newBase.ttl = ttl;
             
             paloList[newKey] = newBase;
-            callback(null, newBase);
+            checkClient(newBase,function(err,client){
+                callback(null, client);
+            })
             setTimeout(function() {
                 delete paloList[id];
             }, ttl);
             return newKey;
         }else{
-            callback(null,paloList[id]);
+            checkClient(paloList[id],function(err,client){
+                console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+                console.log(err);
+                //console.log(result);
+                callback(err,client);
+            })
             return id;
+        }
+        function checkClient(client,cb){
+            client.call('server','databases',{},function(err,result){
+                cb(err,client);
+            })
         }
     }
     module.exports.getClient = getClient;
@@ -749,12 +761,25 @@
             sid: sid,
             ttl: ttl
     	},function(err,client){
+            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+            console.log(err);
+            
+            
+            /**
+             * Checking client still alive
+             * 
+             **/
+            
             if (!err){
+                console.log('noerror');
                 req.paloClient = client;
                 
                 next();
             }else{
-                res.send('error');
+                req.logout();
+                res.send(+err,{
+                    success: false
+                });
             }
         });
     }

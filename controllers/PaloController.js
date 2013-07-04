@@ -21,7 +21,7 @@ function extractResultWrap(opt,req,res){
         if (!err){
             res.send(extractResult(opt.fields,result.rows));
         }else{
-            res.send({
+            res.send(+err,{
                 success: false,
                 msg: result
             });
@@ -170,6 +170,35 @@ module.exports = {
                     success: false,
                     msg: result
                 });
+            }
+        });
+    },
+    get_cell_values: function(req,res){
+        var query = {
+            database: req.query.database,
+            cube: req.query.cube,
+            paths: req.query.paths
+        };
+        
+        req.paloClient.call('cell','values',{
+            query: query
+        },function(err,result){
+            if (!err){
+                var coordinates = req.query.paths.split(':');
+                var results = [];
+                for (var i=0;i<result.rows.length;++i){
+                    results.push({
+                        coordinate: coordinates[i],
+                        value: result.rows[i].value
+                    });
+                }
+                res.json({
+                    success: true,
+                    total: +results.length,
+                    rows: results
+                });
+            }else{
+                res.send(+err,result);
             }
         });
     }

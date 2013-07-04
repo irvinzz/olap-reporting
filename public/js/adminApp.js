@@ -1,5 +1,20 @@
 var Ext = Ext || {};
 
+Ext.data.Types.array = {
+    convert: function(v, data) {
+        console.log('<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>');
+        var r='';
+        for (var i=0;i<data.length;++i){
+            r.push(data[i].toString());
+        }
+        return r;
+    },
+    sortType: function(v) {
+        return v.length;
+    },
+    type: 'array'
+};
+
 Ext.Loader.setConfig({
     enabled: true,
     disableCaching: true,
