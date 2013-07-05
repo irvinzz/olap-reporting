@@ -15,9 +15,8 @@ module.exports = {
         });
     }],
     delete_index: function(req,res){
+        palo.purgeClient(req.session.passport.paloKey);
         req.logout();
-        palo.purgeClient(req.session.paloKey);
-        delete req.session.paloKey;
         res.json({
             success: true
         });

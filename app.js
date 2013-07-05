@@ -121,6 +121,7 @@ app.get('socket.io/socket.io.js',function(req,res,next){
 });
 
 app.all('/api/palo/*',paloClient.getClientWrap);
+//app.all('/api/coordinates',)
 
 expressController.bind(app,{
     directory: __dirname+'/controllers',

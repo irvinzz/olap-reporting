@@ -4,5 +4,10 @@
         "password": "305d71975594225738687f13791ecd8f",
         "host": "olap.rts-ugra.ru",
         "port": 7921
+    },
+    "redis":{
+        "host": "127.0.0.1",
+        "port": "6379",
+        "db": "2"
     }
 }

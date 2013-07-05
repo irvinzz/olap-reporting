@@ -645,11 +645,13 @@
         var keyChars = (cm || '0123456789abcdef').split(''); //  string to array conversation ? why ?
         var key = '';
         for (var i = 0; i < l; ++i) {
-            var j = Math.round(Math.random() * keyChars.length);
+            var j = Math.floor(Math.random() * keyChars.length);
             key += keyChars[j];
         }
         return key;
     }
+    
+    module.exports.getRandKey = getRandKey;
     
     module.exports.getGlobalClient = function(opts, cb) {
         console.log(opts);
@@ -689,9 +691,11 @@
             cb(null, localInstance);
         }
     }
-    
-    module.exports.purgeClient = function(id){
+    function purgeClient(id){
         delete paloList[id];
+    }
+    module.exports.purgeClient = function(id){
+        purgeClient(id);
     }
 
     var getClient = function(params, callback) {
@@ -756,8 +760,8 @@
                 });
             }
         }
-        req.session.paloKey = getClient({
-            paloKey: req.session.paloKey,
+        req.session.passport.paloKey = getClient({
+            paloKey: req.session.passport.paloKey,
             sid: sid,
             ttl: ttl
     	},function(err,client){
@@ -771,11 +775,11 @@
              **/
             
             if (!err){
-                console.log('noerror');
                 req.paloClient = client;
                 
                 next();
             }else{
+                purgeClient(req.session.passport.paloKey);
                 req.logout();
                 res.send(+err,{
                     success: false
@@ -783,12 +787,6 @@
             }
         });
     }
-/*module.exports.getInstance = function(options){
-        if (pc===undefined){
-            pc = new paloClass(options);
-        }
-        return pc;
-    }*/
 })();
 var localInstance;
 var paloList = {};

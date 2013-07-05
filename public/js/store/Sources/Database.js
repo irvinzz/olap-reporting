@@ -1,4 +1,5 @@
 var Ext = Ext || {};
+
 Ext.define('Olap.store.Sources.Database',{
     extend: 'Ext.data.Store',
     fields: ['abbr', 'text'],
@@ -14,4 +15,8 @@ Ext.define('Olap.store.Sources.Database',{
              root: 'rows'
          }
      }
+});
+
+Ext.create('Olap.store.Sources.Database',{
+    storeId: 'Olap.store.Sources.Database'
 });

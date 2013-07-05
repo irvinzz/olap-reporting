@@ -1,11 +1,12 @@
 (function(){
     var redis = require("redis");
-    var config = require("../controllers/config");
+    //var config = require("../controllers/config");
     var dbclient;
+    var nconf = require('../init/nconf')();
     module.exports = function() {
         if (!dbclient){
-            dbclient = redis.createClient(config.db.port, config.db.host);
-            dbclient.select(2);
+            dbclient = redis.createClient(nconf.get('redis:port'), nconf.get('redis.host'));
+            dbclient.select(nconf.get('redis:db'));
             dbclient.on("connect",function(){
                 console.log("RedisClient connected;");
             });

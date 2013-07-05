@@ -15,7 +15,14 @@ Ext.Ajax.disableCaching = false;
 
 Ext.application({
     name: 'olapapp',
-    controllers: ['Olap.controller.Admin','Olap.controller.Navigator','Olap.controller.Hash','Olap.controller.Socket_io','Olap.controller.History'],
+    controllers: [
+        'Olap.controller.Admin',
+        'Olap.controller.Navigator',
+        'Olap.controller.Hash',
+        'Olap.controller.Socket_io',
+        'Olap.controller.History',
+        'Olap.controller.SourceManager'
+    ],
     launch: function() {
         window.viewport = Ext.create('Olap.view.Viewport');
         Ext.History.add('/');

@@ -29,6 +29,19 @@ function extractResultWrap(opt,req,res){
     });
 }
 module.exports = {
+    get_randKey: function(req,res){
+        var num = 10;
+        var results = [];
+        for (var i=0; i<num; i++){
+            results.push(palo.getRandKey());
+        }
+        res.json(results);
+    },
+    get_tmp: function(req,res){
+        req.session.paloKey = undefined;
+        delete req.session.paloKey;
+        res.redirect('/ch');
+    },
     get_servers_index: function(req,res){
         res.send('fine');
     },
