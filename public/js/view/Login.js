@@ -13,6 +13,30 @@ Ext.define('Olap.view.Login',{
             defaults: {
                 xtype: 'textfield'
             },
+            submit1: function(){
+                var win = this.up('window');
+                var form = this;
+                if (form.isValid()){
+                    var values = form.getForm().getValues();
+                    /*console.log(password);
+                    console.log(md5(password));*/
+                    Ext.Ajax.request({
+                        url: '/api/auth/local',
+                        method: 'POST',
+                        params:{
+                            user: values.user,
+                            password: md5(values.password)
+                        },
+                        success: function(response, opts){
+                            win.close();
+                            Ext.History.add('/');
+                        },
+                        failure: function(response, opts){
+                            console.log('fail');
+                        }
+                    });
+                }
+            },
             items: [
                 {
                     fieldLabel: 'username',
@@ -23,6 +47,14 @@ Ext.define('Olap.view.Login',{
                     name: 'password',
                     renderer: function(val){
                         return 'pwd';
+                    },
+                    listeners: {
+                        specialkey: function( field, e, eOpts ){
+                            if (e.getKey() == e.ENTER) {
+                                var form = field.up('form');
+                                form.submit1();
+                            }
+                        }
                     }
                 }
             ],
@@ -30,30 +62,7 @@ Ext.define('Olap.view.Login',{
                 {
                     text: 'Submit',
                     handler: function(){
-                        var win = this.up('window');
-                        var form = this.up('form');
-                        if (form.isValid()){
-                            var values = form.getForm().getValues();
-                            /*console.log(password);
-                            console.log(md5(password));*/
-                            Ext.Ajax.request({
-                                url: '/api/auth/local',
-                                method: 'POST',
-                                params:{
-                                    user: values.user,
-                                    password: md5(values.password)
-                                },
-                                success: function(response, opts){
-                                    var loc = response.getResponseHeader('location');
-                                    //window.location.replace(loc);
-                                    win.close();
-                                    Ext.History.add('/');
-                                },
-                                failure: function(response, opts){
-                                    console.log('fail');
-                                }
-                            });
-                        }
+                        this.up('form').submit1();
                     }
                 }
             ]

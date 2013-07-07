@@ -73,6 +73,7 @@ Ext.define('Olap.controller.History',{
     },
     routes:{
         '/': function(){
+            console.log('at /');
             if (mw!==undefined) mw.hide();
             //window.viewport.removeAll();
             Ext.Ajax.request({

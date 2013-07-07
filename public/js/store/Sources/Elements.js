@@ -1,14 +1,9 @@
 var Ext = Ext || {};
 
 Ext.define('Olap.store.Sources.Elements',{
-    extend: 'Ext.data.Store',
-    fields: ['abbr','text'],
+    extend: 'Ext.data.TreeStore',
     proxy: {
-        type: 'rest',
-        url: '/api/palo/dimension/elements',
-        reader: {
-            type: 'json',
-            root: 'rows'
-        }
+        type: 'ajax',
+        url: '/api/palo/dimension/elements/tree'
     }
 });

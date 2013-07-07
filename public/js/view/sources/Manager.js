@@ -73,7 +73,7 @@ Ext.define('Olap.view.sources.Manager', {
             }, {
                 text: 'Значения',
                 dataIndex: 'valueText',
-                flex: 3
+                flex: 8
             }],
             flex: 1
         }, {
@@ -81,13 +81,9 @@ Ext.define('Olap.view.sources.Manager', {
             xtype: 'treepanel',
             flex: 2,
             height: 200,
-            store: Ext.create('Ext.data.TreeStore', {
-                proxy: {
-                    type: 'ajax',
-                    url: '/api/palo/dimension/elements/tree'
-                }
-            })
-        }, {
+            rootVisible: false,
+            store: Ext.create('Olap.store.Sources.Elements')
+        },{
             xtype: 'button',
             text: 'dump',
             id: 'DumpButton'
