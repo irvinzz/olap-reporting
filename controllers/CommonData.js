@@ -1,95 +1,16 @@
 var redis = require('../controllers/database.js')();
-var directions = ['ASC','DESC'];
-var f = {
-    getall: function(opts,c){
-
-        var me = this;
-        var prefix=opts.prefix;
-        redis.keys(prefix+":*",function(err,result){
-            var l = result.length;
-            var i = 0;
-            var res=[];
-            for (var j=0;j<l;j++){
-                opts.key = result[j];
-                me.getbyid(opts,onGet);
-            }
-            function afterGet(){
-                if (i>=l){
-                    c(null,res);
-                }
-            }
-            afterGet();
-            function onGet(err,result){
-                i++;
-                if (!err){
-                    if (!!result){
-                        res.push(result);
-                    }
-                }
-                afterGet();
-            }
-        });
-    },
-    getbyid: function(opts, c) {
-        var id = opts.id || (opts.key.split(':')[1]) || undefined;
-        var key = opts.key || (opts.prefix + ':' + opts.id) || undefined;
-        if (key === undefined || id === undefined) return c('key || id not specified', null);
-        redis.hgetall(opts.key || (opts.prefix + ':' + opts.id), function(err, result) {
-            result.id = id;
-            c(err, result);
-        });
-        
-        /*function(err,result){
-            if (!err){
-                if (!!result){
-                    c(null,result);
-                }else{
-                    c(null,null);
-                }
-            }else{
-                c(err,null);
-            }
-            c(err,result);
-        }*/
-    },
-    delete: function(opts,c){
-        mapper[opts.entry].deleteById(opts.id,c);
-    },
-    cleanup: function(obj,defaults){
-        //  Setting up defaults values
-        for (var j in defaults){
-            var x = obj[j];
-            if ((x===0) || (x==='')){
-                obj[j]=defaults[j];
-            }
-        }
-        return obj;
-    },
-    out: function(res,err,result){
-        if (!err){
-            res.json({
-                success: true,
-                total: result.total || 0,
-                rows: result.rows
-            });
-        }else{
-            res.json({
-                success: false,
-                result: err
-            });
-        }
-    }    
-};
+var f = require('../controllers/CommonDataInner.js');
 
 module.exports = function(opts){
     opts.defaults = opts.defaults || {};
     var o = {
         prefix: opts.prefix,
+        
         fields: opts.fields,
         hiddenFields: opts.hiddenFields
     };
     // COMMON REST
-    return {
+    var r = {
         get_index: function(req,res){
             o.limit = req.query.limit || 25;
             o.page = req.query.page || 1;
@@ -117,6 +38,9 @@ module.exports = function(opts){
                 });
             });
         },
+        post_id: function(req,res,id){
+            r.post_index(req,res);
+        },
         post_index: function(req,res){
             var obj = {};
             for (var i in req.body){
@@ -137,7 +61,12 @@ module.exports = function(opts){
                     record[opts.fields[i]] = req.body[opts.fields[i]];
                 }
                 redis.hmset(opts.prefix+':'+id,redis.obj2str(record),function(err,result){
-                    f.out(res,err,result);
+                    record.id=id;
+                    f.out(res,err,{
+                        success: true,
+                        total: 1,
+                        rows: [record]
+                    });
                 });
             }
                 
@@ -167,6 +96,7 @@ module.exports = function(opts){
             });
         }
     };
+    return r;
 };
 
 

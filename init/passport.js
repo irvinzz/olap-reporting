@@ -30,19 +30,17 @@ function passport_init(){
                     };
                     done(null,user);
                 }else{
-                    done(err,result);
+                    done(null,false);
                 }
             }
         );
     }));
     return passport;
 }
-(function(){    
-    var instance;
-    module.exports = function(){
-        if (instance===undefined){
-            instance = passport_init();
-        }
-        return instance;
-    };
-})();
+var instance;
+module.exports = function() {
+    if (instance === undefined) {
+        instance = passport_init();
+    }
+    return instance;
+};

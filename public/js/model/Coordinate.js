@@ -5,6 +5,10 @@ Ext.define('Olap.model.Coordinate', {
     fields: [
     //{name: 'id', type: 'int'},
     {
+        name: 'server',
+        type: 'int'
+    },
+    {
         name: 'cube',
         type: 'int'
     }, {
@@ -15,6 +19,9 @@ Ext.define('Olap.model.Coordinate', {
         type: 'string'
     }, {
         name: 'paths',
+        type: 'string'
+    }, {
+        name: 'configure',
         type: 'string'
     }]
 });

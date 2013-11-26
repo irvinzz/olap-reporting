@@ -1,12 +1,13 @@
 //var redis = require('../controllers/database.js')();
 var redis = require('redis').createClient();
+var _ = require('underscore');
 function onGetResult(){
 }
 var post_index;
 function errPass(err,reply,cb){
     
 }
-var fields = ['database','cube','paths','name'];
+var fields = ['server','database','cube','paths','name'];
 module.exports = {
     get_index : function(req,res){
         var limit = +req.query.limit || 25;

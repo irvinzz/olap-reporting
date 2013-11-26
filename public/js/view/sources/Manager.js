@@ -1,6 +1,7 @@
 var Ext = Ext || {};
 
 Ext.require([
+    'Olap.store.Sources.Server',
     'Olap.store.Sources.Database',
     'Olap.store.Sources.Cube',
     'Olap.store.Sources.CubeDimensions',
@@ -28,7 +29,12 @@ Ext.define('Olap.view.sources.Manager', {
         items: [{
             xtype: 'textfield',
             id: 'SourceNameField',
-            fieldLabel: 'Имя источника',
+            fieldLabel: 'Имя источника'
+        },{
+            id: 'ServerBox',
+            editable: false,
+            fieldLabel: 'Сервер',
+            store: 'Olap.store.Sources.Server',
         }, {
             id: 'DatabaseBox',
             editable: false,
@@ -85,15 +91,18 @@ Ext.define('Olap.view.sources.Manager', {
             store: Ext.create('Olap.store.Sources.Elements')
         },{
             xtype: 'button',
-            text: 'dump',
-            id: 'DumpButton'
+            text: 'Add',
+            itemId: 'AddButton'
         }]
-    }, {
+    }, Ext.create('Olap.view.common.List',{
+        
         xtype: 'gridpanel',
         id: 'CoordGrid',
         flex: 2,
         title: 'Источники',
-        store: Ext.create('Olap.store.Coordinates'),
+        //store: Ext.data.StoreManager.lookup('OlapStoreCoordinates'),
+        store: Ext.create('Olap.store.Coordinates',{
+        }),
         columns: [{
             text: 'ID',
             dataIndex: 'id',
@@ -101,15 +110,32 @@ Ext.define('Olap.view.sources.Manager', {
         }, {
             text: 'Имя',
             dataIndex: 'name',
-            flex: 3
+            flex: 3,
+            editor: 'textfield'
+        },{
+            text: 'Server',
+            dataIndex: 'server',
+            flex: 1,
+            editor: {
+                xtype: 'combo',
+                store: 'Olap.store.Sources.Server'
+            }
         }, {
             text: 'DB',
             dataIndex: 'database',
-            flex: 1
+            flex: 1,
+            editor: {
+                xtype: 'combo',
+                store: 'Olap.store.Sources.Database'
+            }
         }, {
             text: 'Cube',
             dataIndex: 'cube',
-            flex: 1
+            flex: 1,
+            editor: {
+                xtype: 'combo',
+                store: 'Olap.store.Sources.Cubes'
+            }
         }, {
             text: 'Координаты',
             dataIndex: 'paths',
@@ -122,10 +148,21 @@ Ext.define('Olap.view.sources.Manager', {
         }, {
             text: 'Получить значение',
             itemId: 'ReceiveValueButton'
-        }]
-    }]
+        }, {
+            text: 'Dump',
+            itemId: 'DumpButton'
+        }],
+        /*dockedItems: [{
+            xtype: 'pagingtoolbar',
+            dock: 'bottom',
+            displayInfo: true,
+            store: Ext.data.StoreManager.lookup('OlapStoreCoordinates'),
+        }]*/
+    })
+    ]
 });
 
+console.log(Ext.data.StoreManager.lookup('OlapStoreCoordinates'));
 
 
 

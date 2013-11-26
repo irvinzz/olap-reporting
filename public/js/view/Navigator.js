@@ -40,7 +40,8 @@ Ext.define('Olap.store.Navigator',{
             },
             {
                 text: "Отчеты",
-                entryId: 'olap.reports.navigator',
+                //entryId: 'olap.reports.navigator',
+                entryId: 'Olap.view.reports.Manager',
                 expanded: true,
                 icon: '/img/icons/report.png',
                 children: [
@@ -48,7 +49,7 @@ Ext.define('Olap.store.Navigator',{
                         text: "Шаблоны",
                         leaf: true,
                         icon: '/img/icons/script.png',
-                        entryId: 'Olap.view.templates.Edit'
+                        entryId: 'Olap.view.templates.Manager'
                     },
                     {
                         text: "Рассылки",
@@ -69,6 +70,17 @@ Ext.define('Olap.store.Navigator',{
                 icon: '/img/icons/book_previous.png',
                 entryId: 'Olap.view.sources.Manager',
                 leaf: true
+            },
+            {
+                text: 'Relational',
+                icon: '/img/mysql.ico',
+                children:[
+                    {
+                        text: 'Выгрузки',
+                        entryId: 'Olap.view.relational.Manager',
+                        leaf: true
+                    }
+                ]
             },
             {
                 text: 'Palo',

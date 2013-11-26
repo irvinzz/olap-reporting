@@ -20,5 +20,6 @@ Ext.define('Olap.store.Sources.CubeDimensions',{
             type: 'json',
             root: 'rows'
         }
-    }
+    },
+    autoLoad: false
 });

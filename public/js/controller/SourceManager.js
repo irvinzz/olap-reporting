@@ -5,9 +5,12 @@ Ext.define('Olap.controller.SourceManager',{
     extend: 'Ext.app.Controller',
     getCurr: function(){
         var r = {};
+        var srvbox = this.getServerBox();
+        console.log(srvbox);
         var dbbox = this.getDatabaseBox();
         var cubebox = this.getCubeBox();
         var cubedimensionsgrid = this.getCubeDimensionsGrid();
+        try { r.server = srvbox.findRecordByValue(srvbox.getValue()).data.abbr; } catch(e) {}
         try { r.database = dbbox.findRecordByValue(dbbox.getValue()).data.abbr; } catch(e) {}
         try { r.cube = cubebox.findRecordByValue(cubebox.getValue()).data.abbr; } catch(e) {}
         try { r.dimension = cubedimensionsgrid.getView().getSelectionModel().getSelection()[0].get('abbr'); } catch (e) {}
@@ -23,14 +26,33 @@ Ext.define('Olap.controller.SourceManager',{
                     //  !
                 }
             },
-            '#SourceManager #DatabaseBox':{
-                render: function(){
-                    var box = me.getDatabaseBox();
+            '#SourceManager #ServerBox':{
+                render: function( combo, eOpts){
+                    var box = combo;
                     var store = box.store;
                     store.load(function(){
                         box.setValue(store.getAt(0));
                     });
                 },
+                change: function(combo,newValue, oldValue, eOpts){
+                    var nextBox = me.getDatabaseBox();
+                    var store = nextBox.store;
+                    store.load({
+                        params: me.getCurr(),
+                        callback: function(records, operation, success){
+                            nextBox.setValue(store.getAt(0));
+                        }
+                    });
+                }
+            },
+            '#SourceManager #DatabaseBox':{
+                /*render: function(){
+                    var box = me.getDatabaseBox();
+                    var store = box.store;
+                    store.load(function(){
+                        box.setValue(store.getAt(0));
+                    });
+                },*/
                 change: function(combo, newValue, oldValue, eOpts){
                     var box = me.getCubeBox();
                     var store = box.store;
@@ -49,22 +71,34 @@ Ext.define('Olap.controller.SourceManager',{
                     store.load({
                         params: me.getCurr(),
                         callback: function(records, operation, success){
-                            grid.getView().getSelectionModel().select(records[0]);
+                            Ext.Array.each(records,function(r, i, countriesItSelf) {
+                                var store = Ext.create('Olap.store.Sources.Elements');
+                                var c = me.getCurr();
+                                c.dimension = r.data.abbr;
+                                store.load({
+                                    params: c,
+                                    callback: function(records,operation,success){
+                                        r.set('valueText',records[0].data.text);
+                                        r.set('value',records[0].data.index);
+                                    }
+                                });
+                            });
+//                            grid.getView().getSelectionModel().select(records[0]);
                         }
                     });
                 }
             },
             '#SourceManager #CubeDimensionsGrid':{
                 select: function ( grid, record, eOpts ) {
-                    console.log('cubedimension selected');
                     var tree = me.getElementsTree();
                     var store = tree.store;
                     var c = me.getCurr();
                     c.dimension = record.data.abbr;
+                    c.checked = record.get('value');
                     store.load({
                         params: c,
                         callback: function(records, operation, success){
-                            //  do nothing
+                            console.log('it is here',store);
                         }
                     });
                 }
@@ -94,7 +128,7 @@ Ext.define('Olap.controller.SourceManager',{
                     combo.setValue(combo.store.getAt(1));
                 }
             },
-            '#SourceManager #DumpButton':{
+            '#SourceManager #AddButton':{
                 click: function(button, e, eOpts){
                     var CubeDimensionsStore = me.getCubeDimensionsGrid().store;
                     var SourceNameField = me.getSourceNameField();
@@ -112,16 +146,25 @@ Ext.define('Olap.controller.SourceManager',{
                             eM.push(val.split(','));
                         }
                         console.log(val);
-                        
                     });
                     
                     var c = me.getCurr();
                     var name = SourceNameField.getValue();
+                    if (''===name){
+                        Ext.create('Olap.view.common.Notification',{
+                            title: 'Ошибка',
+                            html: 'Не указан обязательный параметр "Имя"'
+                        }).show();
+                        return false;
+                    }
                     var m = {
                         name: name,
+                        server: c.server,
                         database: c.database,
                         cube: c.cube,
-                        paths: JSON.stringify(_.cartesianProductOfArray(eM))
+                        configure: JSON.stringify(eM),
+                        //paths: JSON.stringify(_.cartesianProductOfArray(eM))
+                        paths: JSON.stringify(eM)
                     };
                     CoordStore.add(m);
                 }
@@ -164,20 +207,27 @@ Ext.define('Olap.controller.SourceManager',{
             '#SourceManager #CoordGrid #ReceiveValueButton':{
                 click: function(button, e, eOpts){
                     var item = me.getCoordGrid().getView().getSelectionModel().getSelection()[0];
-                    console.log(item.data);
                     var obj = item.data;
                     var query = {
+                        server: obj.server,
                         database: obj.database,
                         cube: obj.cube,
-                        paths: JSON.parse(obj.paths).join(':')
+                        paths: (_.cartesianProductOfArray(Ext.JSON.decode(obj.paths))).join(':')
                     };
                     Ext.Ajax.request({
                         method: 'GET',
                         url: '/api/palo/cell/values',
                         params: query,
                         success: function(response, opts){
-                            var result = JSON.parse(response.responseText);
-                            Ext.Msg.alert('Ответ',result.rows[0].value + ' по адресу '+result.rows[0].coordinate);
+                            var result = Ext.JSON.decode(response.responseText);
+                            var results = [];
+                            for (var i=0;i<result.rows.length;i++){
+                                results.push({
+                                    c: result.rows[i].coordinate,
+                                    v: result.rows[i].value
+                                });
+                            }
+                            Ext.Msg.alert('Ответ',results);
                             console.log(response,opts);
                         },
                         failure: function(response, opts){
@@ -186,10 +236,19 @@ Ext.define('Olap.controller.SourceManager',{
                     });
                     console.log(obj);
                 }
+            },
+            '#SourceManager #CoordGrid #DumpButton':{
+                click: function(button, e, eOpts){
+                    var item = me.getCoordGrid().getView().getSelectionModel().getSelection()[0];
+                    console.log(item.data);
+                }
             }
         });
     },
     refs:[{
+        ref: 'ServerBox',
+        selector: '#SourceManager #ServerBox'
+    },{
         ref: 'DatabaseBox',
         selector: '#SourceManager #DatabaseBox'
     },{

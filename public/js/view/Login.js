@@ -32,7 +32,7 @@ Ext.define('Olap.view.Login',{
                             Ext.History.add('/');
                         },
                         failure: function(response, opts){
-                            console.log('fail');
+                            Ext.Msg.alert('Authorize', 'Wrong login or password');
                         }
                     });
                 }
@@ -45,9 +45,7 @@ Ext.define('Olap.view.Login',{
                 {
                     fieldLabel: 'password',
                     name: 'password',
-                    renderer: function(val){
-                        return 'pwd';
-                    },
+                    inputType: 'password',
                     listeners: {
                         specialkey: function( field, e, eOpts ){
                             if (e.getKey() == e.ENTER) {

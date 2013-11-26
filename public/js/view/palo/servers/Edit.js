@@ -16,7 +16,7 @@ Ext.define('Olap.view.palo.servers.Edit',{
             {
                 xtype: 'textfield',
                 fieldLabel: 'IP-Адрес',
-                name: 'ipaddress',
+                name: 'host',
                 allowBlank: false,
                 value: D.email || ''
             },

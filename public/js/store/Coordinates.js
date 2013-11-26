@@ -5,6 +5,7 @@ Ext.require([
 ]);
 
 Ext.define('Olap.store.Coordinates', {
+    extend: 'Ext.data.Store',
     model: 'Olap.model.Coordinate',
     proxy: {
         type: 'rest',
@@ -17,3 +18,8 @@ Ext.define('Olap.store.Coordinates', {
     autoLoad: true,
     autoSync: true
 });
+
+Ext.create('Olap.store.Coordinates',{
+    storeId: 'OlapStoreCoordinates',
+});
+

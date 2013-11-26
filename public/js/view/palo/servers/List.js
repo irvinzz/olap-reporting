@@ -6,10 +6,10 @@ Ext.define('Olap.model.Palo.Servers', {
     fields: [
         {name: 'id',    type: 'int'   },
         {name: 'name',  type: 'string'},
-        {name: 'ipaddress', type: 'string'},
+        {name: 'host', type: 'string'},
         {name: 'port', type: 'int'},
-        {name: 'login', type: 'string'},
-        {name: 'password', type: 'string'}
+        {name: 'user', type: 'string'},
+        {name: 'extern_password', type: 'string'}
     ]
 });
 
@@ -29,18 +29,19 @@ Ext.define('Olap.store.Palo.Servers', {
 });
 
 Ext.define('Olap.view.palo.servers.List',{
+    id: 'Olap.view.palo.servers.List',
     extend: 'Olap.view.common.List',
     title: 'Список Серверов Palo',
     store: Ext.create('Olap.store.Palo.Servers'),
     columns: [
         { text: 'Номер', dataIndex: 'id', flex: 0 },
         { text: 'Имя',  dataIndex: 'name', flex: 1, editor: 'textfield' },
-        { text: 'Адрес', dataIndex: 'ipaddress', flex: 1, editor: 'textfield' },
+        { text: 'Адрес', dataIndex: 'host', flex: 1, editor: 'textfield' },
         { text: 'Порт', dataIndex: 'port', flex: 0, editor: 'textfield' },
-        { text: 'Логин', dataIndex: 'login', flex: 0, editor: 'textfield' },
+        { text: 'Логин', dataIndex: 'user', flex: 0, editor: 'textfield' },
         {
             text: 'Пароль',
-            dataIndex: 'password',
+            dataIndex: 'extern_password',
             flex: 0,
             editor:{
                 xtype:'textfield',
@@ -75,6 +76,16 @@ Ext.define('Olap.view.palo.servers.List',{
         }*/
     },
     itemcontextmenu:[
+        {
+            text: 'Remove',
+            handler: function(i,e,eO){
+                var si = i.up('menu').selecteditem;
+                var store = si.store;
+                console.log(si);
+                store.remove(si);
+            }
+        },
+        '-',
         {
             text: 'info',
             handler: function(item, e, eOpts){

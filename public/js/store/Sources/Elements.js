@@ -5,5 +5,6 @@ Ext.define('Olap.store.Sources.Elements',{
     proxy: {
         type: 'ajax',
         url: '/api/palo/dimension/elements/tree'
-    }
+    },
+    autoLoad: false
 });

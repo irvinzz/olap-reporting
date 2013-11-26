@@ -1,7 +1,4 @@
-var http = require("http");
-var db = require("../controllers/database");
 var palo = require('../controllers/libs');
-var MD5 = require('MD5');
 /*
  * GET home page.
  */

@@ -21,7 +21,10 @@ Ext.application({
         'Olap.controller.Hash',
         'Olap.controller.Socket_io',
         'Olap.controller.History',
-        'Olap.controller.SourceManager'
+        'Olap.controller.SourceManager',
+        'Olap.controller.PaloServerManagerController',
+        'Olap.controller.TemplateManager',
+        'Olap.controller.ReportsManager'
     ],
     launch: function() {
         window.viewport = Ext.create('Olap.view.Viewport');
